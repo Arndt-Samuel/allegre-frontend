@@ -10,7 +10,7 @@ interface LinkProps extends ChakraLinkProps {
 
 export const Link: React.FC<LinkProps> = ({ children, ...props }) => (
   <ChakraLink
-    fontSize="18px"
+    fontSize={['15px', '18px']}
     color="brand.primary"
     fontWeight={'700'}
     {...props}

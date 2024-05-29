@@ -47,6 +47,8 @@ const InputPassword: React.FC<InputProps> = (props) => {
         focusBorderColor="brand.primary"
         pr="4.5rem"
         type={show ? 'text' : 'password'}
+        placeholder="*******************"
+        fontWeight={'500'}
       />
       <InputRightElement h="100%">
         <Button

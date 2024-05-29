@@ -14,7 +14,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       >
         <Box
           position={'absolute'}
-          bgImage="linear-gradient(to bottom left, #A5B4FC , transparent 20%), linear-gradient(to top right, #A5B4FC , transparent 20%)"
+          bgImage={[
+            'linear-gradient(to bottom, #A5B4FC , transparent 20%), linear-gradient(to top, #A5B4FC , transparent 20%)',
+            'linear-gradient(to bottom left, #A5B4FC , transparent 20%), linear-gradient(to top right, #A5B4FC , transparent 20%)'
+          ]}
           w={'100vw'}
           h={'100vh'}
           zIndex={-1}
