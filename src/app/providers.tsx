@@ -6,6 +6,8 @@ import { Plus_Jakarta_Sans } from 'next/font/google'
 
 const colors = {
   primary: '#4F46E5',
+  purple20: '#C7D2FE',
+  purple50: '#6366F1',
   black: '#000000',
   white: '#FFFFFF',
   gray10: '#F1F5F9',
