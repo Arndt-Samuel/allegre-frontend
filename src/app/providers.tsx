@@ -10,6 +10,7 @@ const colors = {
   purple50: '#6366F1',
   black: '#000000',
   white: '#FFFFFF',
+  gray05: '#F8FAFC',
   gray10: '#F1F5F9',
   gray20: '#E2E8F0',
   gray30: '#CBD5E1',

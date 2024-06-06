@@ -1,1 +1,6 @@
 export * from './Input'
+export * from './Header'
+export * from './StudentCard'
+export * from './SearchBar'
+export * from './HeaderStudentList'
+export * from './SubHeaderStudentList'
