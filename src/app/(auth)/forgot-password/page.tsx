@@ -1,6 +1,6 @@
 'use client'
-import { Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
-import { Input, Button, Link } from '../../components'
+import { Text, Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
+import { Input, Button } from '../../components'
 import AuthLayout from '../layout'
 import { ReactElement } from 'react'
 import { useFormik } from 'formik'
@@ -10,16 +10,12 @@ export default function Login(): ReactElement {
   const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
     useFormik({
       initialValues: {
-        email: '',
-        password: ''
+        email: ''
       },
       validationSchema: Yup.object({
         email: Yup.string()
           .email('E-mail inválido')
-          .required('E-mail é obrigatório.'),
-        password: Yup.string()
-          .min(6, 'Senha deve ter ao menos 6 caracteres')
-          .required('Senha é obrigatório.')
+          .required('E-mail é obrigatório.')
       }),
       onSubmit: (data) => {
         console.log({ data })
@@ -50,7 +46,17 @@ export default function Login(): ReactElement {
             flexDir={'column'}
             alignItems={'center'}
             justifyContent={'center'}
+            p={['35px', '24px']}
           >
+            <Text
+              mt="30px"
+              color={'brand.gray60'}
+              fontWeight={'500'}
+              fontSize={'18px'}
+            >
+              Digite abaixo seu e-mail que enviaremos um código de recuperação
+              de senha:
+            </Text>
             <FormControl id="email" mt={['30px', '35px']}>
               <FormLabel
                 fontWeight={'700'}
@@ -74,28 +80,6 @@ export default function Login(): ReactElement {
                 mt={'5px'}
               />
             </FormControl>
-            <FormControl id="password" mt={['15px', '20px']}>
-              <FormLabel
-                fontWeight={'700'}
-                ml={'5px'}
-                mb={'0px'}
-                color={'brand.gray60'}
-              >
-                Senha
-              </FormLabel>
-              <Input.Password
-                id="password"
-                name="password"
-                value={values.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={errors.password}
-                touched={touched.password}
-                w={['100%', '476px']}
-                mt={'5px'}
-                fontWeight={'500'}
-              />
-            </FormControl>
             <Button
               w={['100%', '476px']}
               h={'56px'}
@@ -103,13 +87,10 @@ export default function Login(): ReactElement {
               color={'brand.white'}
               type="submit"
             >
-              Login
+              Enviar
             </Button>
           </Flex>
         </form>
-        <Link href="/forgot-password" mt={['10px', '20px']}>
-          Esqueceu a senha? Clique aqui.
-        </Link>
       </Flex>
     </AuthLayout>
   )

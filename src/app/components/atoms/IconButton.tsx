@@ -3,7 +3,6 @@ import {
   IconButtonProps as ChakraIconButtonProps,
   Flex
 } from '@chakra-ui/react'
-import { IconType } from 'react-icons'
 
 interface IconButtonProps extends ChakraIconButtonProps {}
 
