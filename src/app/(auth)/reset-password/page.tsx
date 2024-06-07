@@ -1,21 +1,26 @@
 'use client'
-import { Text, Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
+import { Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
 import { Input, Button } from '../../components'
 import AuthLayout from '../layout'
 import { ReactElement } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
-export default function ForgotPassWord(): ReactElement {
+export default function ResetPassword(): ReactElement {
   const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
     useFormik({
       initialValues: {
-        email: ''
+        password: '',
+        confirmPassword: ''
       },
       validationSchema: Yup.object({
-        email: Yup.string()
-          .email('E-mail inválido')
-          .required('E-mail é obrigatório.')
+        password: Yup.string()
+          .min(6, 'Senha deve ter ao menos 6 caracteres')
+          .required('Senha é obrigatório.'),
+        confirmPassword: Yup.string()
+          .min(6, 'confirmar a senha deve ter ao menos 6 caracteres')
+          .required('confirmar a senha é obrigatório.')
+          .oneOf([Yup.ref('password')], 'Senhas não são iguais.')
       }),
       onSubmit: (data) => {
         console.log({ data })
@@ -46,38 +51,49 @@ export default function ForgotPassWord(): ReactElement {
             flexDir={'column'}
             alignItems={'center'}
             justifyContent={'center'}
-            p={['35px', '24px']}
           >
-            <Text
-              mt="30px"
-              color={'brand.gray60'}
-              fontWeight={'500'}
-              fontSize={'18px'}
-            >
-              Digite abaixo seu e-mail que enviaremos um código de recuperação
-              de senha:
-            </Text>
-            <FormControl id="email" mt={['30px', '35px']}>
+            <FormControl id="password" mt={['15px', '20px']}>
               <FormLabel
                 fontWeight={'700'}
                 ml={'5px'}
                 mb={'0px'}
                 color={'brand.gray60'}
               >
-                E-mail
+                Nova senha
               </FormLabel>
-              <Input
-                type="email"
-                id="email"
-                name="email"
-                value={values.email}
+              <Input.Password
+                id="password"
+                name="password"
+                value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                touched={touched.email}
-                error={errors.email}
-                placeholder="email@exemplo.com"
+                error={errors.password}
+                touched={touched.password}
                 w={['100%', '476px']}
                 mt={'5px'}
+                fontWeight={'500'}
+              />
+            </FormControl>
+            <FormControl id="confirmPassword" mt={['15px', '20px']}>
+              <FormLabel
+                fontWeight={'700'}
+                ml={'5px'}
+                mb={'0px'}
+                color={'brand.gray60'}
+              >
+                Confirmar nova senha
+              </FormLabel>
+              <Input.Password
+                id="confirmPassword"
+                name="confirmPassword"
+                value={values.confirmPassword}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.confirmPassword}
+                touched={touched.confirmPassword}
+                w={['100%', '476px']}
+                mt={'5px'}
+                fontWeight={'500'}
               />
             </FormControl>
             <Button
@@ -87,7 +103,7 @@ export default function ForgotPassWord(): ReactElement {
               color={'brand.white'}
               type="submit"
             >
-              Enviar
+              Salvar
             </Button>
           </Flex>
         </form>

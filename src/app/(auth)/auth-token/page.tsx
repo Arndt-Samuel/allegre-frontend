@@ -1,21 +1,21 @@
 'use client'
-import { Text, Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
-import { Input, Button } from '../../components'
+import { Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
+import { Input, Button, Link } from '../../components'
 import AuthLayout from '../layout'
 import { ReactElement } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
-export default function ForgotPassWord(): ReactElement {
+export default function AuthToken(): ReactElement {
   const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
     useFormik({
       initialValues: {
-        email: ''
+        token: ''
       },
       validationSchema: Yup.object({
-        email: Yup.string()
-          .email('E-mail inválido')
-          .required('E-mail é obrigatório.')
+        token: Yup.string()
+          .length(8, 'Token deve conter 6 caracteres.')
+          .required('Token é obrigatório.')
       }),
       onSubmit: (data) => {
         console.log({ data })
@@ -31,7 +31,7 @@ export default function ForgotPassWord(): ReactElement {
         borderRadius={'12px'}
         boxShadow={['none', 'lg']}
         borderColor={'brand.gray10'}
-        p={['35px', '24px']}
+        p={['30px', '24px']}
         alignItems={'center'}
         justifyContent={'center'}
       >
@@ -46,38 +46,28 @@ export default function ForgotPassWord(): ReactElement {
             flexDir={'column'}
             alignItems={'center'}
             justifyContent={'center'}
-            p={['35px', '24px']}
           >
-            <Text
-              mt="30px"
-              color={'brand.gray60'}
-              fontWeight={'500'}
-              fontSize={'18px'}
-            >
-              Digite abaixo seu e-mail que enviaremos um código de recuperação
-              de senha:
-            </Text>
-            <FormControl id="email" mt={['30px', '35px']}>
+            <FormControl id="token" mt={['15px', '20px']}>
               <FormLabel
                 fontWeight={'700'}
                 ml={'5px'}
                 mb={'0px'}
                 color={'brand.gray60'}
               >
-                E-mail
+                Token
               </FormLabel>
               <Input
-                type="email"
-                id="email"
-                name="email"
-                value={values.email}
+                id="token"
+                name="token"
+                value={values.token}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                touched={touched.email}
-                error={errors.email}
-                placeholder="email@exemplo.com"
+                error={errors.token}
+                touched={touched.token}
                 w={['100%', '476px']}
                 mt={'5px'}
+                fontWeight={'500'}
+                placeholder="Ex: 00000000"
               />
             </FormControl>
             <Button
@@ -87,10 +77,15 @@ export default function ForgotPassWord(): ReactElement {
               color={'brand.white'}
               type="submit"
             >
-              Enviar
+              Avançar
             </Button>
           </Flex>
         </form>
+        <Flex alignItems={'center'} justifyContent={'center'}>
+          <Link mt={['10px', '20px']}>
+            Não recebeu o código? Clique aqui para reenviar.
+          </Link>
+        </Flex>
       </Flex>
     </AuthLayout>
   )
