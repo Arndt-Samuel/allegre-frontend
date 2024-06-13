@@ -11,7 +11,7 @@ interface MenuItemProps {
 
 export const MenuItem: React.FC<MenuItemProps> = ({ children }) => {
   return (
-    <ChakraMenuItem w={'320px'} h={'48px'} fontWeight={500}>
+    <ChakraMenuItem w={'100%'} h={'100%'} fontWeight={500}>
       {children}
     </ChakraMenuItem>
   )

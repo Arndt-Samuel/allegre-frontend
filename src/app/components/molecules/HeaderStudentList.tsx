@@ -83,9 +83,14 @@ export const HeaderStudentList: React.FC = () => (
       w={'191px'}
       h={'48px'}
       color={'brand.white'}
+      border={'1px solid'}
+      _hover={{
+        bg: 'brand.purple50',
+        color: 'brand.purple20'
+      }}
       fontSize={'16px'}
       fontWeight={700}
-      leftIcon={<SmallAddIcon color={'brand.white'} w={'25px'} h={'25px'} />}
+      leftIcon={<SmallAddIcon w={'25px'} h={'25px'} />}
     >
       Adicionar Aluno
     </Button>

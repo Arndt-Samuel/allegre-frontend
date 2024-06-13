@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import {
   Input as ChakraInput,
   InputGroup,
@@ -8,28 +8,46 @@ import {
   InputProps as ChakraInputProps
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { MaskToCurrency } from './MaskToCurrency'
 
 interface InputProps extends ChakraInputProps {
-  error: ReactNode
+  error?: ReactNode
   touched?: boolean
+  mask?: string
+  maskChar?: string | null
 }
 
 export const Input: React.FC<InputProps> & {
   Password: React.FC<InputProps>
-} = ({ error, touched, ...props }) => (
-  <>
-    <ChakraInput
-      borderColor={'brand.gray30'}
-      borderRadius={'123px'}
-      fontSize={'18px'}
-      size={'md'}
-      h={'48px'}
-      focusBorderColor="brand.primary"
-      {...props}
-    />
-    {touched && error && <Text color="red">{error}</Text>}
-  </>
-)
+} = ({ maskChar, mask, error, touched, ...props }) => {
+  const [value, setValue] = useState<string>('')
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, selectionStart, selectionEnd } = event.target
+    const nextState = { value, selectionStart, selectionEnd }
+    const formattedState = MaskToCurrency({ nextState })
+    setValue(formattedState.value)
+  }
+
+  return (
+    <>
+      <ChakraInput
+        value={value}
+        onChange={handleChange}
+        mask={mask}
+        maskChar={maskChar || ''}
+        borderColor={'brand.gray30'}
+        borderRadius={'123px'}
+        fontSize={'18px'}
+        size={'md'}
+        h={'48px'}
+        focusBorderColor="brand.primary"
+        {...props}
+      />
+      {touched && error && <Text color="red">{error}</Text>}
+    </>
+  )
+}
 
 const InputPassword: React.FC<InputProps> = ({
   value,

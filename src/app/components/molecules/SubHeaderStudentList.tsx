@@ -25,7 +25,7 @@ export const SubHeaderStudentList: React.FC = () => (
           aria-label="Order by crescent"
           icon={<GoTriangleUp />}
           color="brand.gray60"
-          bg={'brand.white'}
+          bg={'brand.gray05'}
           _hover={{
             bg: 'brand.withe'
           }}
@@ -39,7 +39,7 @@ export const SubHeaderStudentList: React.FC = () => (
           _hover={{
             bg: 'brand.withe'
           }}
-          bg={'brand.white'}
+          bg={'brand.gray05'}
           w={'10px'}
           h={'10px'}
         />

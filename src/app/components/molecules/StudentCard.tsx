@@ -66,15 +66,12 @@ export const StudentCard: React.FC = () => (
     <Flex w={'6.79%'} alignItems={'center'} justifyContent={'center'}>
       <IconButton
         aria-label="Edit student arrow"
-        icon={<PiCaretCircleRightBold />}
+        icon={<PiCaretCircleRightBold size={24} />}
         color={'brand.gray60'}
         bg={'brand.white'}
         _hover={{
           bg: 'brand.withe'
         }}
-        w={'20px'}
-        h={'20px'}
-        size={'lg'}
       />
     </Flex>
   </Flex>

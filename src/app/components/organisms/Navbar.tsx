@@ -17,6 +17,10 @@ export const NavBar: React.FC = () => (
     w={'80px'}
     h={'100vh'}
     p={'20px'}
+    position={'fixed'}
+    top={0}
+    left={0}
+    zIndex={10}
   >
     <Flex alignItems={'center'} flexDir={'column'}>
       <Flex alignItems={'center'} justifyContent={'center'}>

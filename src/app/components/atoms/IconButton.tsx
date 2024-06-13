@@ -6,7 +6,7 @@ import {
 
 interface IconButtonProps extends ChakraIconButtonProps {}
 
-const IconButton: React.FC<IconButtonProps> = ({ icon, ...props }) => {
+export const IconButton: React.FC<IconButtonProps> = ({ icon, ...props }) => {
   return (
     <Flex w={'48px'} h={'48px'} alignItems={'center'} justifyContent={'center'}>
       <ChakraIconButton
