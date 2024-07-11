@@ -1,14 +1,63 @@
 'use client'
-import { Text, Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
+import {
+  Text,
+  Flex,
+  Image,
+  FormControl,
+  FormLabel,
+  useToast
+} from '@chakra-ui/react'
 import { Input, Button } from '../../components'
 import AuthLayout from '../layout'
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useMutation } from 'react-query'
+import { useRouter } from 'next/navigation'
+import { forgotPasswordCall } from '@/app/api/auth'
+import { saveItem } from '@/app/api/storage'
+
+interface ForgotPasswordValues {
+  email: string
+}
 
 export default function ForgotPassWord(): ReactElement {
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const toast = useToast()
+  const router = useRouter()
+
+  const mutation = useMutation<void, Error, ForgotPasswordValues>(
+    forgotPasswordCall,
+    {
+      onSuccess: async (data, variables) => {
+        toast({
+          title: 'E-mail de recuperação enviado',
+          description:
+            'Verifique seu e-mail para continuar a recuperação de senha.',
+          status: 'success',
+          duration: 9000,
+          isClosable: true
+        })
+        await saveItem('recoveryEmail', variables.email)
+        router.push('/auth-token')
+      },
+      onError: (error: any) => {
+        setErrorMessage(
+          error?.response?.data?.message || 'Ocorreu um erro, tente novamente.'
+        )
+        toast({
+          title: 'Erro ao enviar e-mail de recuperação',
+          description: error?.response?.data?.message,
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
+      }
+    }
+  )
+
   const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
-    useFormik({
+    useFormik<ForgotPasswordValues>({
       initialValues: {
         email: ''
       },
@@ -18,7 +67,7 @@ export default function ForgotPassWord(): ReactElement {
           .required('E-mail é obrigatório.')
       }),
       onSubmit: (data) => {
-        console.log({ data })
+        mutation.mutate(data)
       }
     })
 
@@ -86,11 +135,13 @@ export default function ForgotPassWord(): ReactElement {
               mt={['25px', '20px']}
               color={'brand.white'}
               type="submit"
+              isLoading={mutation.isLoading}
             >
-              Enviar
+              {mutation.isLoading ? 'Enviando...' : 'Enviar'}
             </Button>
           </Flex>
         </form>
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       </Flex>
     </AuthLayout>
   )

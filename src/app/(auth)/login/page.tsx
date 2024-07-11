@@ -1,14 +1,66 @@
 'use client'
-import { Flex, Image, FormControl, FormLabel } from '@chakra-ui/react'
+import React, { useState } from 'react'
+import { Flex, Image, FormControl, FormLabel, useToast } from '@chakra-ui/react'
 import { Input, Button, Link } from '../../components'
 import AuthLayout from '../layout'
-import { ReactElement } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useMutation } from 'react-query'
+import { loginCall } from '@/app/api/auth'
+import { useRouter } from 'next/navigation'
+import { useUserStore } from '../../hooks/useUserStore'
 
-export default function Login(): ReactElement {
+interface LoginFormValues {
+  email: string
+  password: string
+}
+
+interface AuthResponse {
+  accessToken: string
+  user: {
+    id: number
+    name: string
+    email: string
+    avatarUrl: string
+  }
+}
+
+export const Login: React.FC = () => {
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const toast = useToast()
+  const router = useRouter()
+  const setAll = useUserStore((state) => state.setAll)
+
+  const mutation = useMutation<AuthResponse, Error, LoginFormValues>(
+    (newUser) => loginCall(newUser),
+    {
+      onSuccess: (data) => {
+        toast({
+          title: 'Login feito com sucesso!',
+          status: 'success',
+          duration: 9000,
+          isClosable: true
+        })
+        setAll(data.user, data.accessToken)
+        router.push('/students/create-student')
+      },
+      onError: (error: any) => {
+        setErrorMessage(
+          error?.response?.data?.message || 'Ocorreu um erro, tente novamente.'
+        )
+        toast({
+          title: 'Error',
+          description: error?.response?.data?.message,
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
+        console.error('Erro no login:', error)
+      }
+    }
+  )
   const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
-    useFormik({
+    useFormik<LoginFormValues>({
       initialValues: {
         email: '',
         password: ''
@@ -22,7 +74,7 @@ export default function Login(): ReactElement {
           .required('Senha é obrigatório.')
       }),
       onSubmit: (data) => {
-        console.log({ data })
+        mutation.mutate(data)
       }
     })
 
@@ -102,11 +154,13 @@ export default function Login(): ReactElement {
               mt={['25px', '20px']}
               color={'brand.white'}
               type="submit"
+              isLoading={mutation.isLoading}
             >
-              Login
+              {mutation.isLoading ? 'Carregando...' : 'Login'}
             </Button>
           </Flex>
         </form>
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <Link href="/forgot-password" mt={['10px', '20px']}>
           Esqueceu a senha? Clique aqui.
         </Link>
@@ -114,3 +168,5 @@ export default function Login(): ReactElement {
     </AuthLayout>
   )
 }
+
+export default Login
