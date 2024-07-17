@@ -1,15 +1,18 @@
-import React from 'react'
 import { Flex, IconButton, Text } from '@chakra-ui/react'
 import { GoTriangleUp, GoTriangleDown } from 'react-icons/go'
 
-interface SubHeaderStudentListProps {
-  onSort: (order: 'asc' | 'desc') => void
+interface SubHeaderStudentResponsibleListProps {
+  onSortAscending: () => void
+  onSortDescending: () => void
 }
 
-export const SubHeaderStudentList: React.FC<SubHeaderStudentListProps> = ({
-  onSort
-}) => (
+export const SubHeaderStudentResponsibleList: React.FC<
+  SubHeaderStudentResponsibleListProps
+> = ({ onSortAscending, onSortDescending }) => (
   <Flex
+    flexDir={'row'}
+    justifyContent={'flex-start'}
+    alignItems={'center'}
     w={'100%'}
     h={'48px'}
     bg={'brand.gray05'}
@@ -18,7 +21,7 @@ export const SubHeaderStudentList: React.FC<SubHeaderStudentListProps> = ({
     pl={'24px'}
     pr={'24px'}
   >
-    <Flex alignItems={'center'} justifyContent={'flex-start'} w={'20.07%'}>
+    <Flex alignItems={'center'} justifyContent={'flex-start'} w={'20.06%'}>
       <Text color={'brand.gray60'} fontSize={'14px'} fontWeight={'800'}>
         Nome Completo
       </Text>
@@ -38,7 +41,7 @@ export const SubHeaderStudentList: React.FC<SubHeaderStudentListProps> = ({
           }}
           w={'10px'}
           h={'10px'}
-          onClick={() => onSort('asc')}
+          onClick={onSortAscending}
         />
         <IconButton
           aria-label="Order by descending"
@@ -50,13 +53,13 @@ export const SubHeaderStudentList: React.FC<SubHeaderStudentListProps> = ({
           bg={'brand.gray05'}
           w={'10px'}
           h={'10px'}
-          onClick={() => onSort('desc')}
+          onClick={onSortDescending}
         />
       </Flex>
     </Flex>
     <Flex w={'14.20%'} justifyContent={'flex-start'} alignItems={'center'}>
       <Text color={'brand.gray60'} fontSize={'14px'} fontWeight={'800'}>
-        Responsável
+        Grau de parentesco
       </Text>
     </Flex>
     <Flex w={'13.27%'} justifyContent={'flex-start'} alignItems={'center'}>
@@ -64,17 +67,16 @@ export const SubHeaderStudentList: React.FC<SubHeaderStudentListProps> = ({
         Telefone
       </Text>
     </Flex>
-    <Flex w={'12.46%'} justifyContent={'flex-start'} alignItems={'center'}>
+    <Flex w={'12.42%'} justifyContent={'flex-start'} alignItems={'center'}>
       <Text color={'brand.gray60'} fontSize={'14px'} fontWeight={'800'}>
         CPF
       </Text>
     </Flex>
-    <Flex w={'16.58%'} alignItems={'center'} justifyContent={'center'}>
+    <Flex w={'33.25%'} alignItems={'center'} justifyContent={'flex-start'}>
       <Text color={'brand.gray60'} fontSize={'14px'} fontWeight={'800'}>
-        Oficinas Cadastradas
+        RG
       </Text>
     </Flex>
-    <Flex w={'16.58%'} />
     <Flex w={'6.79%'}></Flex>
   </Flex>
 )

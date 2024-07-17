@@ -1,15 +1,23 @@
-import { Flex, FormControl, FormLabel, Textarea } from '@chakra-ui/react'
-import { Button } from '../atoms'
-import { PiXCircleBold, PiCheckCircleBold } from 'react-icons/pi'
+import { Flex, Button } from '@chakra-ui/react'
+import { PiArrowArcRightBold, PiCheckCircleBold } from 'react-icons/pi'
 
-export const FooterForm: React.FC = () => {
+interface FooterFormProps {
+  onSubmitAll: () => void
+  onNext: () => void
+}
+
+export const FooterForm: React.FC<FooterFormProps> = ({
+  onSubmitAll,
+  onNext
+}) => {
   return (
     <Flex
       w={'84%'}
-      h={'96px'}
+      h={'206px'}
       flexDir={'row'}
       p={'24px'}
       justifyContent={'space-between'}
+      alignItems={'flex-end'}
       mt={'16px'}
       gap={'24px'}
     >
@@ -22,26 +30,31 @@ export const FooterForm: React.FC = () => {
       >
         <Button
           w={'12.18%'}
-          h={'48px'}
+          h={'56px'}
           color={'brand.primary'}
           bg={'brand.white'}
           _hover={{
-            bg: 'red',
-            color: 'brand.white',
-            borderColor: 'red'
+            bg: 'brand.purple50',
+            color: 'brand.white'
           }}
           border={'1px solid'}
+          borderRadius={'1234px'}
           borderColor={'brand.primary'}
           fontSize={'18px'}
           fontWeight={700}
-          leftIcon={<PiXCircleBold size={20} />}
+          rightIcon={<PiArrowArcRightBold size={20} />}
+          onClick={() => {
+            onNext()
+          }}
         >
-          Cancelar
+          Pular
         </Button>
         <Button
           w={'14.76%'}
-          h={'48px'}
+          h={'56px'}
           border={'1px solid'}
+          borderRadius={'1234px'}
+          bg={'brand.primary'}
           _hover={{
             bg: 'brand.purple50',
             color: 'brand.purple20'
@@ -50,8 +63,11 @@ export const FooterForm: React.FC = () => {
           fontWeight={700}
           color={'brand.white'}
           leftIcon={<PiCheckCircleBold size={20} />}
+          onClick={() => {
+            onSubmitAll()
+          }}
         >
-          Salvar dados
+          Salvar e Avançar
         </Button>
       </Flex>
     </Flex>

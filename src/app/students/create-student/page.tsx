@@ -3,9 +3,10 @@ import StudentsLayout from '../layout'
 import { ReactElement } from 'react'
 import { NavBar } from '../../components'
 import { Header } from '../../components'
-import { Flex, IconButton } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 import { PiCaretLeftBold } from 'react-icons/pi'
 import { RegistrationDataList } from '@/app/components/organisms'
+import IconButtonNav from '@/app/components/atoms/IconButtonNav'
 
 export default function StudentDetail(): ReactElement {
   return (
@@ -14,7 +15,7 @@ export default function StudentDetail(): ReactElement {
       <Flex flexDir={'column'}>
         <Header
           iconButton={
-            <IconButton
+            <IconButtonNav
               w={'48px'}
               h={'48px'}
               mr={'10px'}
@@ -30,6 +31,7 @@ export default function StudentDetail(): ReactElement {
               border={'1px solid'}
               borderColor={'brand.gray30'}
               size={'lg'}
+              href="/students/students-table"
             />
           }
         >

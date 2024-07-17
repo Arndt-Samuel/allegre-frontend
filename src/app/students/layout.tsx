@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 
 export default function StudentsLayout({ children }: { children: ReactNode }) {
   return (
-    <Flex w={'100%'} h={'100%'}>
+    <Flex w={'100VW'} h={'100vh'}>
       {children}
     </Flex>
   )

@@ -15,11 +15,12 @@ interface InputProps extends ChakraInputProps {
   touched?: boolean
   mask?: string
   maskChar?: string | null
+  disabled?: boolean
 }
 
 export const Input: React.FC<InputProps> & {
   Password: React.FC<InputProps>
-} = ({ maskChar, mask, error, touched, ...props }) => {
+} = ({ maskChar, mask, error, touched, disabled, ...props }) => {
   const [value, setValue] = useState<string>('')
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +33,7 @@ export const Input: React.FC<InputProps> & {
   return (
     <>
       <ChakraInput
+        isDisabled={disabled}
         value={value}
         onChange={handleChange}
         mask={mask}

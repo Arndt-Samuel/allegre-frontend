@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Flex,
   FormControl,
@@ -15,8 +15,10 @@ import InputMask from 'react-input-mask'
 import { SelectMenu, Text } from '../atoms'
 import { Gender, Ethnicity } from '@/app/enums/enums'
 import { format, isValid, parse, parseISO } from 'date-fns'
+import { api } from '@/app/api'
+import { updateStudentCall } from '@/app/api/student'
 
-interface StudentRegisterFormValues {
+interface StudentUpdateFormValues {
   name: string
   avatarUrl?: string
   rg: string
@@ -30,13 +32,26 @@ interface StudentRegisterFormValues {
 }
 
 interface RegistrationStudentDataFormProps {
-  onSubmit: (values: StudentRegisterFormValues) => Promise<void>
-  savedData?: StudentRegisterFormValues | null
+  studentId: string
+  onSuccess?: () => void
 }
 
-export const RegistrationStudentDataForm: React.FC<
+export const UpdatingStudentDataForm: React.FC<
   RegistrationStudentDataFormProps
-> = ({ onSubmit, savedData }) => {
+> = ({ studentId, onSuccess }) => {
+  const [initialValues, setInitialValues] = useState<StudentUpdateFormValues>({
+    name: '',
+    avatarUrl: '',
+    rg: '',
+    cpf: '',
+    nis: '',
+    gender: Gender.MALE,
+    ethnicity: Ethnicity.BRANCO,
+    dateOfBirth: '',
+    primary_phone: '',
+    secondary_phone: ''
+  })
+
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const toast = useToast()
 
@@ -46,24 +61,33 @@ export const RegistrationStudentDataForm: React.FC<
     return format(parsedDate, 'yyyy-MM-dd')
   }
 
-  const formatDateToDisplay = (dateString: string) => {
-    const parsedDate = parseISO(dateString)
-    return format(parsedDate, 'dd/MM/yyyy')
-  }
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        const response = await api.get(`/student?id=${studentId}`)
+        const studentData = response.data.data[0]
+        setInitialValues({
+          name: studentData.name,
+          avatarUrl: studentData.avatarUrl || '',
+          rg: studentData.rg,
+          cpf: studentData.cpf,
+          nis: studentData.nis,
+          gender: studentData.gender,
+          ethnicity: studentData.ethnicity,
+          dateOfBirth: formatDateToInput(studentData.dateOfBirth),
+          primary_phone: studentData.primary_phone,
+          secondary_phone: studentData.secondary_phone
+        })
+      } catch (error) {
+        console.error('Failed to fetch student data', error)
+      }
+    }
+    fetchStudentData()
+  }, [studentId])
 
-  const formik = useFormik<StudentRegisterFormValues>({
-    initialValues: {
-      name: savedData?.name || '',
-      avatarUrl: savedData?.avatarUrl || '',
-      rg: savedData?.rg || '',
-      cpf: savedData?.cpf || '',
-      nis: savedData?.nis || '',
-      gender: savedData?.gender || Gender.MALE,
-      ethnicity: savedData?.ethnicity || Ethnicity.BRANCO,
-      dateOfBirth: savedData ? formatDateToInput(savedData.dateOfBirth) : '',
-      primary_phone: savedData?.primary_phone || '',
-      secondary_phone: savedData?.secondary_phone || ''
-    },
+  const formik = useFormik<StudentUpdateFormValues>({
+    initialValues,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       name: Yup.string().required('Nome completo é obrigatório'),
       avatarUrl: Yup.string().url('URL inválida').nullable(),
@@ -102,7 +126,30 @@ export const RegistrationStudentDataForm: React.FC<
         ...values,
         dateOfBirth: formattedDate
       }
-      onSubmit(submissionValues)
+      try {
+        const response = await updateStudentCall(studentId, submissionValues)
+        toast({
+          title: 'Estudante atualizado com sucesso!',
+          status: 'success',
+          duration: 9000,
+          isClosable: true
+        })
+        if (onSuccess) {
+          onSuccess()
+        }
+      } catch (error) {
+        let errorMessage = 'Erro ao atualizar estudante!'
+        if (error instanceof Error) {
+          errorMessage = error.message
+        }
+        toast({
+          title: 'Erro ao atualizar estudante',
+          description: errorMessage,
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
+      }
     }
   })
 
@@ -145,7 +192,7 @@ export const RegistrationStudentDataForm: React.FC<
         gap={'16px'}
       >
         <Flex w={'100%'} h={'5.54%'}>
-          <Text.CardTitle>Dados Cadastrais</Text.CardTitle>
+          <Text.CardTitle>Dados do Aluno</Text.CardTitle>
         </Flex>
         <Flex flexDir={'column'} h={'36.86%'}>
           <Text
@@ -358,7 +405,11 @@ export const RegistrationStudentDataForm: React.FC<
               onBlur={handleBlur}
               isInvalid={touched.gender && !!errors.gender}
               label="Gênero"
-              options={Object.values(Gender)}
+              options={Object.values(Gender).map((g) => ({
+                label: g,
+                value: g
+              }))}
+              selectedOption={values.gender}
             />
           </FormControl>
           <FormControl w={'28.87%'}>
@@ -369,7 +420,11 @@ export const RegistrationStudentDataForm: React.FC<
               onBlur={handleBlur}
               isInvalid={touched.ethnicity && !!errors.ethnicity}
               label="Etnia"
-              options={Object.values(Ethnicity)}
+              options={Object.values(Ethnicity).map((e) => ({
+                label: e,
+                value: e
+              }))}
+              selectedOption={values.ethnicity}
             />
           </FormControl>
         </Flex>

@@ -1,13 +1,17 @@
 'use client'
 import { ChakraProvider } from '@chakra-ui/react'
-
 import { extendTheme } from '@chakra-ui/react'
 import { Plus_Jakarta_Sans } from 'next/font/google'
+import { QueryClientProvider } from 'react-query'
+import { queryClient } from './api'
+import React from 'react'
 
 const colors = {
   primary: '#4F46E5',
+  purple05: '#EEF2FF',
   purple20: '#C7D2FE',
   purple50: '#6366F1',
+  purple70: '#4338CA',
   black: '#000000',
   white: '#FFFFFF',
   gray05: '#F8FAFC',
@@ -44,5 +48,9 @@ export const theme = extendTheme({
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <ChakraProvider theme={theme}>{children}</ChakraProvider>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ChakraProvider theme={theme}>{children}</ChakraProvider>
+    </QueryClientProvider>
+  )
 }

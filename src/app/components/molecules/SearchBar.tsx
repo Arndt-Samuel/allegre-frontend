@@ -1,10 +1,23 @@
+import React from 'react'
 import { Flex, Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import { PiMagnifyingGlassBold } from 'react-icons/pi'
 
-export const SearchBar = () => {
+interface SearchBarProps {
+  searchTerm: string
+  setSearchTerm: (term: string) => void
+}
+
+export const SearchBar: React.FC<SearchBarProps> = ({
+  searchTerm,
+  setSearchTerm
+}) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value)
+  }
+
   return (
     <Flex
-      w="320px"
+      w="30%"
       h="48px"
       borderRadius="123px"
       border={'1px solid'}
@@ -24,6 +37,8 @@ export const SearchBar = () => {
           focusBorderColor="transparent"
           fontSize={'16px'}
           fontWeight={'500'}
+          value={searchTerm}
+          onChange={handleChange}
         />
       </InputGroup>
     </Flex>

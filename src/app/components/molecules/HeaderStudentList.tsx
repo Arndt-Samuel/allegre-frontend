@@ -1,98 +1,61 @@
-import { ChevronDownIcon, SmallAddIcon } from '@chakra-ui/icons'
-import { Button, MenuItem } from '../atoms'
-import {
-  MenuButton,
-  MenuList,
-  Menu,
-  Button as ChakraButton,
-  Flex
-} from '@chakra-ui/react'
+import React from 'react'
+import { SmallAddIcon } from '@chakra-ui/icons'
+import { Button } from '../atoms'
+import { Flex, FormControl } from '@chakra-ui/react'
 import { SearchBar } from './SearchBar'
+import { SelectMenu } from '../atoms'
 
-export const HeaderStudentList: React.FC = () => (
-  <Flex
-    alignItems={'center'}
-    justifyContent={'space-between'}
-    w={'100%'}
-    h={'80px'}
-    pt={'16px'}
-    pb={'16px'}
-    pl={'24px'}
-    pr={'24px'}
-  >
-    <SearchBar />
+interface HeaderStudentListProps {
+  searchTerm: string
+  setSearchTerm: (term: string) => void
+  classOptions: { label: string; value: string }[]
+  setSelectedClass: (classId: string) => void
+}
 
-    <Menu>
-      <MenuButton
-        alignItems={'center'}
-        justifyContent={'flex-start'}
-        w={'320px'}
-        h={'48px'}
-        border={'1px solid'}
-        borderColor={'brand.gray30'}
-        borderRadius={'123px'}
-        bg={'brand.white'}
-        as={ChakraButton}
-        fontSize={'16px'}
-        fontWeight={'500'}
-        color="brand.gray50"
-        rightIcon={<ChevronDownIcon boxSize={5} color={'brand.gray60'} />}
-      >
-        Oficina
-      </MenuButton>
-      <MenuList
-        w={'320px'}
-        h={'48px'}
-        border={'1px solid'}
-        borderColor={'brand.gray30'}
-      >
-        <MenuItem>Artes</MenuItem>
-        <MenuItem>Informatica</MenuItem>
-        <MenuItem>Musica</MenuItem>
-      </MenuList>
-    </Menu>
-    <Menu>
-      <MenuButton
-        alignItems={'center'}
-        justifyContent={'flex-start'}
-        w={'320px'}
-        h={'48px'}
-        border={'1px solid'}
-        borderColor={'brand.gray30'}
-        borderRadius={'123px'}
-        bg={'brand.white'}
-        as={ChakraButton}
-        fontSize={'16px'}
-        fontWeight={'500'}
-        color="brand.gray50"
-        rightIcon={<ChevronDownIcon boxSize={5} color={'brand.gray60'} />}
-      >
-        Status
-      </MenuButton>
-      <MenuList
-        w={'320px'}
-        h={'48px'}
-        border={'1px solid'}
-        borderColor={'brand.gray30'}
-      >
-        <MenuItem>Ativo</MenuItem>
-        <MenuItem>Inativo</MenuItem>
-      </MenuList>
-    </Menu>
-    <Button
-      w={'191px'}
-      h={'48px'}
-      color={'brand.white'}
-      border={'1px solid'}
-      _hover={{
-        bg: 'brand.purple50',
-        color: 'brand.purple20'
-      }}
-      fontSize={'16px'}
-      fontWeight={700}
-      leftIcon={<SmallAddIcon w={'25px'} h={'25px'} />}
+export const HeaderStudentList: React.FC<HeaderStudentListProps> = ({
+  searchTerm,
+  setSearchTerm,
+  classOptions,
+  setSelectedClass
+}) => {
+  return (
+    <Flex
+      alignItems={'center'}
+      justifyContent={'space-between'}
+      w={'100%'}
+      h={'80px'}
+      pt={'16px'}
+      pb={'16px'}
+      pl={'24px'}
+      pr={'24px'}
     >
-      Adicionar Aluno
-    </Button>
-  </Flex>
-)
+      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <FormControl w={'30%'}>
+        <SelectMenu
+          name="class"
+          value=""
+          onChange={(e) => setSelectedClass(e.target.value)}
+          label=""
+          options={classOptions}
+          selectedOption=""
+        />
+      </FormControl>
+      <Button
+        href="/students/create-student"
+        w={'25%'}
+        h={'48px'}
+        color={'brand.white'}
+        border={'1px solid'}
+        _hover={{
+          bg: 'brand.purple50',
+          color: 'brand.purple20'
+        }}
+        fontSize={'16px'}
+        fontWeight={700}
+        leftIcon={<SmallAddIcon w={'25px'} h={'25px'} />}
+      >
+        Adicionar Aluno
+      </Button>
+    </Flex>
+  )
+}
