@@ -1,7 +1,29 @@
 import React, { useState } from 'react'
-import { Flex, Button } from '@chakra-ui/react'
-import { UpdatingStudentDataForm } from '../molecules'
+import {
+  Flex,
+  Button,
+  useDisclosure,
+  useToast,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter
+} from '@chakra-ui/react'
+import {
+  UpdateStudentDataForm,
+  UpdateStudentAddressForm,
+  UpdateSchoolDataForm,
+  UpdateStudentHealthForm,
+  UpdateStudentComplementaryDataForm,
+  UpdateStudentSocialServicesForm,
+  StudentFamilyFrameTable
+} from '../molecules'
 import { PiArrowArcRightBold, PiCheckCircleBold } from 'react-icons/pi'
+import { StudentResponsibleTable } from '../molecules/StudentResponsibleTable'
+import { useRouter } from 'next/navigation'
+import { deleteStudentCall } from '@/app/api/student'
 
 interface UpdatingDataListProps {
   studentId: string
@@ -11,42 +33,121 @@ export const UpdatingDataList: React.FC<UpdatingDataListProps> = ({
   studentId
 }) => {
   const [activeTab, setActiveTab] = useState(0)
-  const [visitedTabs, setVisitedTabs] = useState([0])
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const cancelRef = React.useRef<HTMLButtonElement>(null)
+  const toast = useToast()
+  const router = useRouter()
 
-  const handleNextStep = () => {
-    setActiveTab((prev) => {
-      const nextTab = prev + 1
-      if (!visitedTabs.includes(nextTab)) {
-        setVisitedTabs([...visitedTabs, nextTab])
-      }
-      return nextTab
-    })
+  const handleTabChange = (index: number) => {
+    setActiveTab(index)
   }
 
-  const handleSkipStep = () => {
-    handleNextStep()
+  const handleDeleteStudent = async () => {
+    try {
+      await deleteStudentCall(studentId)
+      toast({
+        title: 'Aluno deletado com sucesso',
+        status: 'success',
+        duration: 9000,
+        isClosable: true
+      })
+      onClose()
+      router.push('/students/students-table')
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao deletar aluno',
+        description: error.message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true
+      })
+    }
+  }
+
+  const handleFinalize = () => {
+    router.push('/students/students-table')
   }
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
         return (
-          <UpdatingStudentDataForm
+          <UpdateStudentDataForm
             studentId={studentId}
-            onSuccess={handleNextStep}
+            onSuccess={() => handleTabChange(activeTab + 1)}
+          />
+        )
+      case 1:
+        return (
+          <UpdateStudentAddressForm
+            studentId={studentId}
+            onSuccess={() => handleTabChange(activeTab + 1)}
+          />
+        )
+      case 2:
+        return (
+          <StudentResponsibleTable
+            studentId={studentId}
+            responsibles={[]}
+            onAddResponsible={() => {}}
+          />
+        )
+      case 3:
+        return (
+          <UpdateSchoolDataForm
+            studentId={studentId}
+            onSuccess={() => handleTabChange(activeTab + 1)}
+          />
+        )
+      case 4:
+        return (
+          <UpdateStudentHealthForm
+            studentId={studentId}
+            onSuccess={() => handleTabChange(activeTab + 1)}
+          />
+        )
+      case 5:
+        return (
+          <UpdateStudentComplementaryDataForm
+            studentId={studentId}
+            onSuccess={() => handleTabChange(activeTab + 1)}
+          />
+        )
+      case 6:
+        return (
+          <UpdateStudentSocialServicesForm
+            studentId={studentId}
+            onSuccess={() => handleTabChange(activeTab + 1)}
+          />
+        )
+      case 7:
+        return (
+          <StudentFamilyFrameTable
+            studentId={studentId}
+            relatives={[]}
+            onAddFamily={() => {}}
           />
         )
       default:
         return (
-          <UpdatingStudentDataForm
+          <UpdateStudentDataForm
             studentId={studentId}
-            onSuccess={handleNextStep}
+            onSuccess={() => handleTabChange(activeTab + 1)}
           />
         )
     }
   }
 
-  const tabs = ['Dados do Aluno']
+  const tabs = [
+    'Dados do Aluno',
+    'Endereço',
+    'Responsáveis',
+    'Dados Escolares',
+    'Saúde',
+    'Dados Complementares',
+    'Serviços Sociais',
+    'Quadro Familiar'
+  ]
 
   return (
     <Flex
@@ -64,11 +165,7 @@ export const UpdatingDataList: React.FC<UpdatingDataListProps> = ({
         {tabs.map((tab, index) => (
           <Button
             key={index}
-            onClick={() => {
-              if (visitedTabs.includes(index)) {
-                setActiveTab(index)
-              }
-            }}
+            onClick={() => handleTabChange(index)}
             variant="solid"
             bg={activeTab === index ? 'brand.purple05' : 'transparent'}
             color={activeTab === index ? 'brand.primary' : 'brand.gray60'}
@@ -81,7 +178,6 @@ export const UpdatingDataList: React.FC<UpdatingDataListProps> = ({
             border={'none'}
             fontSize={'16px'}
             fontWeight={600}
-            isDisabled={!visitedTabs.includes(index)}
           >
             {tab}
           </Button>
@@ -120,7 +216,7 @@ export const UpdatingDataList: React.FC<UpdatingDataListProps> = ({
             fontSize={'18px'}
             fontWeight={700}
             rightIcon={<PiArrowArcRightBold size={20} />}
-            onClick={handleSkipStep}
+            onClick={() => handleTabChange(activeTab + 1)}
           >
             Pular
           </Button>
@@ -145,13 +241,91 @@ export const UpdatingDataList: React.FC<UpdatingDataListProps> = ({
                   ?.dispatchEvent(
                     new Event('submit', { cancelable: true, bubbles: true })
                   )
+              } else if (activeTab === 1) {
+                document
+                  .getElementById('form-address')
+                  ?.dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true })
+                  )
+              } else if (activeTab === 3) {
+                document
+                  .getElementById('form-school-data')
+                  ?.dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true })
+                  )
+              } else if (activeTab === 4) {
+                document
+                  .getElementById('form-health')
+                  ?.dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true })
+                  )
+              } else if (activeTab === 5) {
+                document
+                  .getElementById('form-complementary-data')
+                  ?.dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true })
+                  )
+              } else if (activeTab === 6) {
+                document
+                  .getElementById('form-social-service')
+                  ?.dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true })
+                  )
+              } else if (activeTab === 7) {
+                handleFinalize()
               }
             }}
           >
-            {activeTab === 2 ? 'Avançar' : 'Salvar e Avançar'}
+            {activeTab === tabs.length - 1 ? 'Finalizar' : 'Salvar e Avançar'}
           </Button>
         </Flex>
+        {activeTab === tabs.length - 1 && (
+          <Button
+            w={'14.76%'}
+            h={'56px'}
+            border={'1px solid'}
+            borderRadius={'1234px'}
+            bg={'red.500'}
+            _hover={{
+              bg: 'red.700',
+              color: 'white'
+            }}
+            fontSize={'18px'}
+            fontWeight={700}
+            color={'white'}
+            onClick={onOpen}
+          >
+            Deletar Aluno
+          </Button>
+        )}
       </Flex>
+
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Deletar Aluno
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Tem certeza? Você não pode desfazer esta ação posteriormente.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancelar
+              </Button>
+              <Button colorScheme="red" onClick={handleDeleteStudent} ml={3}>
+                Deletar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Flex>
   )
 }

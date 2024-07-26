@@ -31,7 +31,7 @@ export const StudentList: React.FC = () => {
   const [selectedClass, setSelectedClass] = useState<string | null>(null)
   const [classOptions, setClassOptions] = useState<
     { label: string; value: string }[]
-  >([])
+  >([{ label: 'Todos alunos', value: '' }])
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null)
 
   const fetchStudents = async (classId?: string, search?: string) => {
@@ -65,12 +65,15 @@ export const StudentList: React.FC = () => {
   const fetchClasses = async () => {
     try {
       const response = await api.get('/class')
-      setClassOptions(
-        response.data.data.map((classItem: { id: string; name: string }) => ({
-          label: classItem.name,
-          value: classItem.id
-        }))
-      )
+      setClassOptions([
+        { label: 'Todos Alunos', value: '' },
+        ...response.data.data.map(
+          (classItem: { id: string; name: string }) => ({
+            label: classItem.name,
+            value: classItem.id
+          })
+        )
+      ])
     } catch (error) {
       console.error('Erro ao buscar oficinas:', error)
     }

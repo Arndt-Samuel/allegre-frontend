@@ -13,9 +13,11 @@ import { StudentResponsibleTable } from '../molecules/StudentResponsibleTable'
 import { StudentHealthForm } from '../molecules/StudentHealth'
 import { StudentSocialServicesForm } from '../molecules/StudentSocialServices'
 import { PiArrowArcRightBold, PiCheckCircleBold } from 'react-icons/pi'
+import { useRouter } from 'next/navigation'
 
 export const RegistrationDataList: React.FC = () => {
   const toast = useToast()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState(0)
   const [studentId, setStudentId] = useState<string | null>(null)
   const [studentFormValues, setStudentFormValues] = useState<any>(null)
@@ -213,6 +215,9 @@ export const RegistrationDataList: React.FC = () => {
       const nextTab = prev + 1
       if (!visitedTabs.includes(nextTab)) {
         setVisitedTabs([...visitedTabs, nextTab])
+      }
+      if (nextTab >= tabs.length) {
+        router.push('/students/students-table')
       }
       return nextTab
     })

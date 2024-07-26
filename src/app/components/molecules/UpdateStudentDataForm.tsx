@@ -18,7 +18,7 @@ import { format, isValid, parse, parseISO } from 'date-fns'
 import { api } from '@/app/api'
 import { updateStudentCall } from '@/app/api/student'
 
-interface StudentUpdateFormValues {
+interface UpdateStudentFormValues {
   name: string
   avatarUrl?: string
   rg: string
@@ -31,15 +31,16 @@ interface StudentUpdateFormValues {
   secondary_phone: string
 }
 
-interface RegistrationStudentDataFormProps {
+interface UpdateStudentDataFormProps {
   studentId: string
   onSuccess?: () => void
 }
 
-export const UpdatingStudentDataForm: React.FC<
-  RegistrationStudentDataFormProps
-> = ({ studentId, onSuccess }) => {
-  const [initialValues, setInitialValues] = useState<StudentUpdateFormValues>({
+export const UpdateStudentDataForm: React.FC<UpdateStudentDataFormProps> = ({
+  studentId,
+  onSuccess
+}) => {
+  const [initialValues, setInitialValues] = useState<UpdateStudentFormValues>({
     name: '',
     avatarUrl: '',
     rg: '',
@@ -85,7 +86,7 @@ export const UpdatingStudentDataForm: React.FC<
     fetchStudentData()
   }, [studentId])
 
-  const formik = useFormik<StudentUpdateFormValues>({
+  const formik = useFormik<UpdateStudentFormValues>({
     initialValues,
     enableReinitialize: true,
     validationSchema: Yup.object({
@@ -127,7 +128,7 @@ export const UpdatingStudentDataForm: React.FC<
         dateOfBirth: formattedDate
       }
       try {
-        const response = await updateStudentCall(studentId, submissionValues)
+        await updateStudentCall(studentId, submissionValues)
         toast({
           title: 'Estudante atualizado com sucesso!',
           status: 'success',

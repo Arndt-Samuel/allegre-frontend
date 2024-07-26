@@ -7,7 +7,7 @@ import Input from './Input'
 import { MaskToCurrency } from './MaskToCurrency'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { CreateFamilyCall } from '@/app/api/student'
+import { createFamilyCall } from '@/app/api/student'
 import { parse, isValid, format } from 'date-fns'
 
 interface StatusFormValues {
@@ -38,10 +38,10 @@ export const StudentStatusForm = forwardRef<HTMLFormElement, StatusFormProps>(
         dateOfBirth: '',
         degree_of_kinship: '',
         marital_status: '',
-        wage: '0',
-        retirement: '0',
-        allowance: '0',
-        other_income: '0',
+        wage: '0,00',
+        retirement: '0,00',
+        allowance: '0,00',
+        other_income: '0,00',
         informal_work: false,
         familiar_observations: '',
         studentId: studentId
@@ -88,7 +88,7 @@ export const StudentStatusForm = forwardRef<HTMLFormElement, StatusFormProps>(
             dateOfBirth: formattedDateOfBirth
           }
 
-          await CreateFamilyCall(submissionValues)
+          await createFamilyCall(submissionValues)
           onSubmit(submissionValues)
         } catch (error: any) {
           toast({
@@ -213,7 +213,22 @@ export const StudentStatusForm = forwardRef<HTMLFormElement, StatusFormProps>(
                 touched={touched.degree_of_kinship}
                 error={errors.degree_of_kinship}
                 label="Grau de parentesco"
-                options={['Pai', 'Mãe', 'Tio/Tia', 'Avô/Avó']}
+                options={[
+                  'Pai',
+                  'Mãe',
+                  'Avô',
+                  'Avó',
+                  'Tio',
+                  'Tia',
+                  'Irmão',
+                  'Irmã',
+                  'Primo',
+                  'Prima',
+                  'Padrasto',
+                  'Madrasta',
+                  'Guardião Legal',
+                  'Outro'
+                ]}
               />
             </FormControl>
             <FormControl w={'45%'}>

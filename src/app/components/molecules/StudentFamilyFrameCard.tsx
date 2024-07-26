@@ -1,13 +1,16 @@
+import React from 'react'
 import { Flex, IconButton, Text } from '@chakra-ui/react'
 import { PiCaretCircleRightBold } from 'react-icons/pi'
 import { parseISO, differenceInYears } from 'date-fns'
 
 interface StudentFamilyFrameCardProps {
   relative: any
+  onOpen: (relativeId: string) => void
 }
 
 export const StudentFamilyFrameCard: React.FC<StudentFamilyFrameCardProps> = ({
-  relative
+  relative,
+  onOpen
 }) => {
   const calculateAge = (birthdate: string) => {
     const birthDate = parseISO(birthdate)
@@ -83,6 +86,7 @@ export const StudentFamilyFrameCard: React.FC<StudentFamilyFrameCardProps> = ({
           _hover={{
             bg: 'brand.withe'
           }}
+          onClick={() => onOpen(relative.id)}
         />
       </Flex>
     </Flex>

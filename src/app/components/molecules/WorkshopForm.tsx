@@ -11,7 +11,7 @@ import { Text, SelectMenu } from '../atoms'
 import { PiPlusCircleBold, PiMinusCircleBold } from 'react-icons/pi'
 import { useFormik, FormikErrors } from 'formik'
 import * as Yup from 'yup'
-import { getWorkshops, CreateWorkshopCall } from '@/app/api/student'
+import { getWorkshops, createWorkshopCall } from '@/app/api/student'
 import { parse, isValid, format } from 'date-fns'
 
 interface WorkshopFormValues {
@@ -151,7 +151,7 @@ export const WorkshopForm: React.FC<SchoolDataFormProps> = ({
       })
 
       for (const value of formattedValues) {
-        await CreateWorkshopCall(value)
+        await createWorkshopCall(value)
       }
 
       toast({
@@ -187,6 +187,10 @@ export const WorkshopForm: React.FC<SchoolDataFormProps> = ({
     )
     setWorkshops(updatedWorkshops)
     formik.setFieldValue('workshops', updatedWorkshops)
+  }
+
+  const getAvailableWorkshopOptions = (selectedIds: string[]) => {
+    return workshopOptions.filter((option) => !selectedIds.includes(option.id))
   }
 
   return (
@@ -234,7 +238,9 @@ export const WorkshopForm: React.FC<SchoolDataFormProps> = ({
                   )
                 }}
                 label="Oficinas"
-                options={workshopOptions.map((option) => option.name)}
+                options={getAvailableWorkshopOptions(
+                  workshops.map((w) => w.classId)
+                ).map((option) => option.name)}
                 selectedOption={
                   workshopOptions.find(
                     (option) => option.id === workshop.classId

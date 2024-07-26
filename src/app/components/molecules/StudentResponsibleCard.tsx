@@ -1,12 +1,15 @@
+import React from 'react'
 import { Avatar, Flex, IconButton, Text } from '@chakra-ui/react'
 import { PiCaretCircleRightBold } from 'react-icons/pi'
 
 interface StudentResponsibleCardProps {
   responsible: any
+  onOpen: (responsibleId: string) => void
 }
 
 export const StudentResponsibleCard: React.FC<StudentResponsibleCardProps> = ({
-  responsible
+  responsible,
+  onOpen
 }) => (
   <Flex
     flexDir={'row'}
@@ -66,8 +69,9 @@ export const StudentResponsibleCard: React.FC<StudentResponsibleCardProps> = ({
         color={'brand.gray60'}
         bg={'brand.white'}
         _hover={{
-          bg: 'brand.withe'
+          bg: 'brand.white'
         }}
+        onClick={() => onOpen(responsible.id)}
       />
     </Flex>
   </Flex>

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react'
 import {
   Flex,
   FormControl,
@@ -6,62 +7,122 @@ import {
   useToast
 } from '@chakra-ui/react'
 import { SelectMenu, Text } from '../atoms'
-import React from 'react'
 import Input from './Input'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { createStudentSchoolDataCall } from '@/app/api/student'
+import { api } from '@/app/api'
+import {
+  createStudentSchoolDataCall,
+  updateStudentSchoolDataCall
+} from '@/app/api/student'
 
-interface SchoolDataFormValues {
+interface UpdateSchoolDataFormValues {
   SchoolName: string
   SchoolGrade: string
   FavoriteSchoolSubject: string
   SchoolObservations: string
-  studentId: string
 }
 
-interface SchoolDataFormProps {
+interface UpdateSchoolDataFormProps {
   studentId: string
-  onSubmit: (values: SchoolDataFormValues) => Promise<void>
-  savedData?: SchoolDataFormValues | null
+  onSuccess?: () => void
 }
 
-export const SchoolDataForm: React.FC<SchoolDataFormProps> = ({
+export const UpdateSchoolDataForm: React.FC<UpdateSchoolDataFormProps> = ({
   studentId,
-  onSubmit,
-  savedData
+  onSuccess
 }) => {
+  const [initialValues, setInitialValues] =
+    useState<UpdateSchoolDataFormValues>({
+      SchoolName: '',
+      SchoolGrade: '',
+      FavoriteSchoolSubject: '',
+      SchoolObservations: ''
+    })
+  const [schoolDataId, setSchoolDataId] = useState<string | null>(null)
   const toast = useToast()
-  const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
-    useFormik<SchoolDataFormValues>({
-      initialValues: {
-        SchoolName: savedData?.SchoolName || '',
-        SchoolGrade: savedData?.SchoolGrade || '',
-        FavoriteSchoolSubject: savedData?.FavoriteSchoolSubject || '',
-        SchoolObservations: savedData?.SchoolObservations || '',
-        studentId: studentId
-      },
-      validationSchema: Yup.object({
-        SchoolName: Yup.string(),
-        SchoolGrade: Yup.string(),
-        FavoriteSchoolSubject: Yup.string(),
-        SchoolObservations: Yup.string()
-      }),
-      onSubmit: async (values) => {
-        try {
-          await createStudentSchoolDataCall(values)
-          onSubmit(values)
-        } catch (error: any) {
+
+  useEffect(() => {
+    const fetchSchoolData = async () => {
+      try {
+        const response = await api.get(`/student-school-data/${studentId}`)
+        const schoolData = response.data?.[0]
+        if (schoolData) {
+          setSchoolDataId(schoolData.id)
+          setInitialValues({
+            SchoolName: schoolData.SchoolName,
+            SchoolGrade: schoolData.SchoolGrade,
+            FavoriteSchoolSubject: schoolData.FavoriteSchoolSubject,
+            SchoolObservations: schoolData.SchoolObservations
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch school data', error)
+        toast({
+          title: 'Erro',
+          description:
+            'Não foi possível buscar os dados escolares. Tente novamente mais tarde.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
+      }
+    }
+    fetchSchoolData()
+  }, [studentId, toast])
+
+  const formik = useFormik<UpdateSchoolDataFormValues>({
+    initialValues,
+    enableReinitialize: true,
+    validationSchema: Yup.object({
+      SchoolName: Yup.string().required('Nome da Escola é obrigatório'),
+      SchoolGrade: Yup.string().required('Ano Escolar é obrigatório'),
+      FavoriteSchoolSubject: Yup.string().required(
+        'Matéria de preferência é obrigatória'
+      ),
+      SchoolObservations: Yup.string().required(
+        'Observações escolares são obrigatórias'
+      )
+    }),
+    onSubmit: async (values) => {
+      try {
+        if (schoolDataId) {
+          await updateStudentSchoolDataCall(schoolDataId, values)
           toast({
-            title: 'Erro ao criar dados escolares',
-            description: error.message || 'Ocorreu um erro, tente novamente.',
-            status: 'error',
+            title: 'Dados escolares atualizados com sucesso!',
+            status: 'success',
+            duration: 9000,
+            isClosable: true
+          })
+        } else {
+          await createStudentSchoolDataCall({
+            ...values,
+            studentId
+          })
+          toast({
+            title: 'Dados escolares criados com sucesso!',
+            status: 'success',
             duration: 9000,
             isClosable: true
           })
         }
+        if (onSuccess) {
+          onSuccess()
+        }
+      } catch (error: any) {
+        toast({
+          title: 'Erro ao salvar dados escolares',
+          description: error.message || 'Ocorreu um erro, tente novamente.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
       }
-    })
+    }
+  })
+
+  const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
+    formik
 
   return (
     <form
@@ -106,8 +167,7 @@ export const SchoolDataForm: React.FC<SchoolDataFormProps> = ({
               value={values.SchoolName}
               onChange={handleChange}
               onBlur={handleBlur}
-              touched={touched.SchoolName}
-              error={errors.SchoolName}
+              isInvalid={touched.SchoolName && !!errors.SchoolName}
               placeholder="Nome da Escola"
               mt={'5px'}
               fontSize={'16px'}
@@ -117,10 +177,10 @@ export const SchoolDataForm: React.FC<SchoolDataFormProps> = ({
             <SelectMenu
               name="SchoolGrade"
               value={values.SchoolGrade}
+              selectedOption={values.SchoolGrade}
               onChange={handleChange}
               onBlur={handleBlur}
-              touched={touched.SchoolGrade}
-              error={errors.SchoolGrade}
+              isInvalid={touched.SchoolGrade && !!errors.SchoolGrade}
               label="Ano Escolar"
               options={[
                 '1 ano EF',
@@ -154,8 +214,9 @@ export const SchoolDataForm: React.FC<SchoolDataFormProps> = ({
               value={values.FavoriteSchoolSubject}
               onChange={handleChange}
               onBlur={handleBlur}
-              touched={touched.FavoriteSchoolSubject}
-              error={errors.FavoriteSchoolSubject}
+              isInvalid={
+                touched.FavoriteSchoolSubject && !!errors.FavoriteSchoolSubject
+              }
               placeholder="Matéria de preferência"
               mt={'5px'}
               fontSize={'16px'}
@@ -169,7 +230,7 @@ export const SchoolDataForm: React.FC<SchoolDataFormProps> = ({
           alignItems={'center'}
           justifyContent={'space-between'}
         >
-          <FormControl id="school-observations" w={['28.87%']}>
+          <FormControl id="SchoolObservations" w={['28.87%']}>
             <FormLabel
               fontWeight={'700'}
               ml={'5px'}
@@ -190,6 +251,9 @@ export const SchoolDataForm: React.FC<SchoolDataFormProps> = ({
               value={values.SchoolObservations}
               onChange={handleChange}
               onBlur={handleBlur}
+              isInvalid={
+                touched.SchoolObservations && !!errors.SchoolObservations
+              }
               placeholder="Insira aqui observações escolares da criança."
               mt={'5px'}
               fontSize={'16px'}

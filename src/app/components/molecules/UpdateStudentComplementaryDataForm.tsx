@@ -5,44 +5,77 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import NumberInput from './NumberInput'
 import Input from './Input'
-import { createComplementaryDataCall } from '@/app/api/student'
-interface StudentComplementaryFormValues {
+import {
+  createComplementaryDataCall,
+  updateComplementaryDataCall
+} from '@/app/api/student'
+import { useEffect, useState } from 'react'
+import { api } from '@/app/api'
+
+interface UpdateStudentComplementaryFormValues {
   clothingSize: string
   shoeSize: string
   favorite_soccer_team: string
   likeMoreInProject: string
   dream: string
-  studentId: string
 }
 
-interface StudentComplementaryFormProps {
+interface UpdateStudentComplementaryFormProps {
   studentId: string
-  onSubmit: (values: StudentComplementaryFormValues) => Promise<void>
-  savedData?: StudentComplementaryFormValues | null
+  onSuccess?: () => void
 }
 
-export const StudentComplementaryDataForm: React.FC<
-  StudentComplementaryFormProps
-> = ({ studentId, onSubmit, savedData }) => {
+export const UpdateStudentComplementaryDataForm: React.FC<
+  UpdateStudentComplementaryFormProps
+> = ({ studentId, onSuccess }) => {
   const toast = useToast()
+  const [initialValues, setInitialValues] =
+    useState<UpdateStudentComplementaryFormValues>({
+      clothingSize: '',
+      shoeSize: '',
+      favorite_soccer_team: '',
+      likeMoreInProject: '',
+      dream: ''
+    })
+  const [complementaryDataId, setComplementaryDataId] = useState<string | null>(
+    null
+  )
 
-  const {
-    handleSubmit,
-    handleBlur,
-    values,
-    handleChange,
-    errors,
-    touched,
-    setFieldValue
-  } = useFormik<StudentComplementaryFormValues>({
-    initialValues: {
-      clothingSize: savedData?.clothingSize || '',
-      shoeSize: savedData?.shoeSize || '',
-      favorite_soccer_team: savedData?.favorite_soccer_team || '',
-      likeMoreInProject: savedData?.likeMoreInProject || '',
-      dream: savedData?.dream || '',
-      studentId: studentId
-    },
+  useEffect(() => {
+    const fetchComplementaryData = async () => {
+      try {
+        const response = await api.get(
+          `/student-complementary-data/${studentId}`
+        )
+        const complementaryData = response.data?.[0]
+        if (complementaryData) {
+          setComplementaryDataId(complementaryData.id)
+          setInitialValues({
+            clothingSize: complementaryData.clothingSize,
+            shoeSize: complementaryData.shoeSize,
+            favorite_soccer_team: complementaryData.favorite_soccer_team,
+            likeMoreInProject: complementaryData.likeMoreInProject,
+            dream: complementaryData.dream
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch complementary data', error)
+        toast({
+          title: 'Erro',
+          description:
+            'Não foi possível buscar os dados complementares do aluno. Tente novamente mais tarde.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
+      }
+    }
+    fetchComplementaryData()
+  }, [studentId, toast])
+
+  const formik = useFormik<UpdateStudentComplementaryFormValues>({
+    initialValues,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       clothingSize: Yup.string(),
       shoeSize: Yup.string(),
@@ -52,11 +85,29 @@ export const StudentComplementaryDataForm: React.FC<
     }),
     onSubmit: async (values) => {
       try {
-        await createComplementaryDataCall(values)
-        onSubmit(values)
+        if (complementaryDataId) {
+          await updateComplementaryDataCall(complementaryDataId, values)
+          toast({
+            title: 'Dados complementares do aluno atualizados com sucesso!',
+            status: 'success',
+            duration: 9000,
+            isClosable: true
+          })
+        } else {
+          await createComplementaryDataCall({ ...values, studentId })
+          toast({
+            title: 'Dados complementares do aluno criados com sucesso!',
+            status: 'success',
+            duration: 9000,
+            isClosable: true
+          })
+        }
+        if (onSuccess) {
+          onSuccess()
+        }
       } catch (error: any) {
         toast({
-          title: 'Erro ao criar dados complementares',
+          title: 'Erro ao salvar dados complementares do aluno',
           description: error.message || 'Ocorreu um erro, tente novamente.',
           status: 'error',
           duration: 9000,
@@ -65,6 +116,17 @@ export const StudentComplementaryDataForm: React.FC<
       }
     }
   })
+
+  const {
+    handleSubmit,
+    handleBlur,
+    values,
+    handleChange,
+    errors,
+    touched,
+    setFieldValue
+  } = formik
+
   return (
     <form
       id="form-complementary-data"
@@ -192,7 +254,7 @@ export const StudentComplementaryDataForm: React.FC<
               onBlur={handleBlur}
               touched={touched.likeMoreInProject}
               error={errors.likeMoreInProject}
-              placeholder="Insira aqui o que a aluno mais gosta no projeto."
+              placeholder="Insira aqui o que o aluno mais gosta no projeto."
               mt={'5px'}
               fontSize={'16px'}
             />

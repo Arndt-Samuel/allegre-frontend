@@ -1,7 +1,7 @@
 'use client'
 import { useRouter, useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { Flex } from '@chakra-ui/react'
+import { Flex, Spinner } from '@chakra-ui/react'
 import {
   NavBar,
   Header,
@@ -32,7 +32,16 @@ const StudentUpdate = () => {
   }, [id])
 
   if (!studentData) {
-    return <div>Loading...</div>
+    return (
+      <Flex
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+        width="100%"
+      >
+        <Spinner size="xl" color="brand.primary" />
+      </Flex>
+    )
   }
 
   return (

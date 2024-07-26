@@ -14,7 +14,7 @@ interface CheckboxProps extends ChakraCheckboxProps {
 export const CheckBox: React.FC<CheckboxProps> = ({
   children,
   error,
-  value,
+  isChecked,
   touched,
   onChange,
   onBlur,
@@ -24,9 +24,9 @@ export const CheckBox: React.FC<CheckboxProps> = ({
   return (
     <>
       <ChakraCheckbox
+        isChecked={isChecked}
         onChange={onChange}
         onBlur={onBlur}
-        value={String(value)}
         isInvalid={isInvalid}
         borderColor={'brand.gray30'}
         colorScheme="purple"

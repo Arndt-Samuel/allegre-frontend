@@ -138,7 +138,7 @@ export const createStudentResponsibleCall = async (
   return response.data
 }
 
-export const CreateStudentSchoolDataCall = async (
+export const createStudentSchoolDataCall = async (
   data: CreateStudentSchoolDataValues
 ) => {
   const response = await api.post('/student-school-data', data)
@@ -157,34 +157,84 @@ export const getWorkshops = async () => {
   }
 }
 
-export const CreateWorkshopCall = async (data: CreateWorkshopValues) => {
+export const createWorkshopCall = async (data: CreateWorkshopValues) => {
   const response = await api.post('/student-classes', data)
   return response.data
 }
 
-export const CreateHealthCall = async (data: HealthValues) => {
+export const createHealthCall = async (data: HealthValues) => {
   const response = await api.post('/student_health', data)
   return response.data
 }
 
-export const CreateComplementaryDataCall = async (
+export const createComplementaryDataCall = async (
   data: ComplementaryDataValues
 ) => {
   const response = await api.post('/student-complementary-data', data)
   return response.data
 }
 
-export const CreateSocialServiceCall = async (data: SocialServiceValues) => {
+export const createSocialServiceCall = async (data: SocialServiceValues) => {
   const response = await api.post('/student_social_service', data)
   return response.data
 }
 
-export const CreateFamilyCall = async (data: StatusValues) => {
+export const createFamilyCall = async (data: StatusValues) => {
   const response = await api.post('/student-family', data)
   return response.data
 }
 
 export const updateStudentCall = async (id: string, data: any) => {
   const response = await api.put(`/student/${id}`, data)
+  return response.data
+}
+
+export const updateAddressCall = async (id: string, data: any) => {
+  const response = await api.put(`/student-address/${id}`, data)
+  return response.data
+}
+
+export const updateStudentSchoolDataCall = async (id: string, data: any) => {
+  const response = await api.put(`/student-school-data/${id}`, data)
+  return response.data
+}
+
+export const updateHealthCall = async (id: string, data: any) => {
+  const response = await api.put(`/student_health/${id}`, data)
+  return response.data
+}
+
+export const updateComplementaryDataCall = async (id: string, data: any) => {
+  const response = await api.put(`/student-complementary-data/${id}`, data)
+  return response.data
+}
+
+export const updateSocialServiceCall = async (id: string, data: any) => {
+  const response = await api.put(`/student_social_service/${id}`, data)
+  return response.data
+}
+
+export const updateStudentResponsibleCall = async (id: string, data: any) => {
+  const response = await api.put(`/student-responsible/${id}`, data)
+  return response.data
+}
+
+export const updateFamilyCall = async (id: string, data: any) => {
+  const response = await api.put(`/student-family/${id}`, data)
+  return response.data
+}
+
+export const deleteStudentResponsibleCall = async (responsibleId: string) => {
+  const response = await api.delete(`/student-responsible/${responsibleId}`)
+  return response.data
+}
+
+export const deleteStudentFamilyCall = async (id: string) => {
+  const response = await api.delete(`/student-family/${id}`)
+  return response.data
+}
+
+export const deleteStudentCall = async (id: string) => {
+  const response = await api.delete(`/student/${id}`)
   return response.data
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Flex, FormControl, FormLabel, useToast } from '@chakra-ui/react'
 import Input from './Input'
 import { Text } from '../atoms'
@@ -6,9 +6,10 @@ import CheckBox from './Checkbox'
 import Textarea from './Textarea'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { createHealthCall } from '@/app/api/student'
+import { createHealthCall, updateHealthCall } from '@/app/api/student'
+import { api } from '@/app/api'
 
-interface HealthFormValues {
+interface UpdateHealthFormValues {
   student_problem_health: boolean
   description_problem_health: string
   student_problem_allergies: boolean
@@ -17,83 +18,130 @@ interface HealthFormValues {
   description_medication: string
   health_insurance: boolean
   insurance: string
-  studentId: string
 }
 
 interface HealthFormProps {
   studentId: string
-  onSubmit: (values: HealthFormValues) => Promise<void>
-  savedData?: HealthFormValues | null
+  onSuccess?: () => void
 }
 
-export const StudentHealthForm: React.FC<HealthFormProps> = ({
+export const UpdateStudentHealthForm: React.FC<HealthFormProps> = ({
   studentId,
-  onSubmit,
-  savedData
+  onSuccess
 }) => {
+  const [initialValues, setInitialValues] = useState<UpdateHealthFormValues>({
+    student_problem_health: false,
+    description_problem_health: '',
+    student_problem_allergies: false,
+    description_problem_allergies: '',
+    student_medication: false,
+    description_medication: '',
+    health_insurance: false,
+    insurance: ''
+  })
+  const [healthId, setHealthId] = useState<string | null>(null)
   const toast = useToast()
 
-  const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
-    useFormik<HealthFormValues>({
-      initialValues: {
-        student_problem_health: savedData?.student_problem_health || false,
-        description_problem_health: savedData?.description_problem_health || '',
-        student_problem_allergies:
-          savedData?.student_problem_allergies || false,
-        description_problem_allergies:
-          savedData?.description_problem_allergies || '',
-        student_medication: savedData?.student_medication || false,
-        description_medication: savedData?.description_medication || '',
-        health_insurance: savedData?.health_insurance || false,
-        insurance: savedData?.insurance || '',
-        studentId: studentId
-      },
-      validationSchema: Yup.object({
-        student_problem_health: Yup.boolean().required(
-          'Aluno possui algum problema de saúde é obrigatório'
-        ),
-        description_problem_health: Yup.string(),
-        student_problem_allergies: Yup.boolean().required(
-          'Aluno possui algum problema alergia é obrigatório'
-        ),
-        description_problem_allergies: Yup.string(),
-        student_medication: Yup.boolean().required(
-          'Aluno faz uso de algum medicamento é obrigatório'
-        ),
-        description_medication: Yup.string(),
-        health_insurance: Yup.boolean().required(
-          'Aluno possui plano de saúde é obrigatório'
-        ),
-        insurance: Yup.string()
-      }),
-      onSubmit: async (values) => {
-        try {
-          await createHealthCall(values)
-          onSubmit(values)
-        } catch (error: any) {
+  const [isHealthIssueChecked, setIsHealthIssueChecked] = useState(false)
+  const [isAllergyChecked, setIsAllergyChecked] = useState(false)
+  const [isMedicationChecked, setIsMedicationChecked] = useState(false)
+  const [isHealthInsuranceChecked, setIsHealthInsuranceChecked] =
+    useState(false)
+
+  useEffect(() => {
+    const fetchHealth = async () => {
+      try {
+        const response = await api.get(`/student_health/${studentId}`)
+        const health = response.data?.[0]
+        if (health) {
+          setHealthId(health.id)
+          setInitialValues({
+            student_problem_health: health.student_problem_health,
+            description_problem_health: health.description_problem_health,
+            student_problem_allergies: health.student_problem_allergies,
+            description_problem_allergies: health.description_problem_allergies,
+            student_medication: health.student_medication,
+            description_medication: health.description_medication,
+            health_insurance: health.health_insurance,
+            insurance: health.insurance
+          })
+          setIsHealthIssueChecked(health.student_problem_health)
+          setIsAllergyChecked(health.student_problem_allergies)
+          setIsMedicationChecked(health.student_medication)
+          setIsHealthInsuranceChecked(health.health_insurance)
+        }
+      } catch (error) {
+        console.error('Failed to fetch health', error)
+        toast({
+          title: 'Erro',
+          description:
+            'Não foi possível buscar a saúde do aluno. Tente novamente mais tarde.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
+      }
+    }
+    fetchHealth()
+  }, [studentId, toast])
+
+  const formik = useFormik<UpdateHealthFormValues>({
+    initialValues,
+    enableReinitialize: true,
+    validationSchema: Yup.object({
+      student_problem_health: Yup.boolean().required(
+        'Aluno possui algum problema de saúde é obrigatório'
+      ),
+      description_problem_health: Yup.string(),
+      student_problem_allergies: Yup.boolean().required(
+        'Aluno possui algum problema alérgico é obrigatório'
+      ),
+      description_problem_allergies: Yup.string(),
+      student_medication: Yup.boolean().required(
+        'Aluno faz uso de algum medicamento é obrigatório'
+      ),
+      description_medication: Yup.string(),
+      health_insurance: Yup.boolean().required(
+        'Aluno possui plano de saúde é obrigatório'
+      ),
+      insurance: Yup.string()
+    }),
+    onSubmit: async (values) => {
+      try {
+        if (healthId) {
+          await updateHealthCall(healthId, values)
           toast({
-            title: 'Erro ao criar saúde',
-            description: error.message || 'Ocorreu um erro, tente novamente.',
-            status: 'error',
+            title: 'Saúde do aluno atualizada com sucesso!',
+            status: 'success',
+            duration: 9000,
+            isClosable: true
+          })
+        } else {
+          await createHealthCall({ ...values, studentId })
+          toast({
+            title: 'Saúde do aluno criada com sucesso!',
+            status: 'success',
             duration: 9000,
             isClosable: true
           })
         }
+        if (onSuccess) {
+          onSuccess()
+        }
+      } catch (error: any) {
+        toast({
+          title: 'Erro ao salvar saúde do aluno',
+          description: error.message || 'Ocorreu um erro, tente novamente.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true
+        })
       }
-    })
+    }
+  })
 
-  const [isHealthIssueChecked, setIsHealthIssueChecked] = useState(
-    values.student_problem_health
-  )
-  const [isAllergyChecked, setIsAllergyChecked] = useState(
-    values.student_problem_allergies
-  )
-  const [isMedicationChecked, setIsMedicationChecked] = useState(
-    values.student_medication
-  )
-  const [isHealthInsuranceChecked, setIsHealthInsuranceChecked] = useState(
-    values.health_insurance
-  )
+  const { handleSubmit, handleBlur, values, handleChange, errors, touched } =
+    formik
 
   return (
     <form id="form-health" onSubmit={handleSubmit} style={{ width: '84%' }}>
@@ -126,6 +174,7 @@ export const StudentHealthForm: React.FC<HealthFormProps> = ({
             }}
             onBlur={handleBlur}
             value={String(values.student_problem_health)}
+            isChecked={values.student_problem_health}
             isInvalid={
               touched.student_problem_health && !!errors.student_problem_health
             }
@@ -176,12 +225,13 @@ export const StudentHealthForm: React.FC<HealthFormProps> = ({
             }}
             onBlur={handleBlur}
             value={String(values.student_problem_allergies)}
+            isChecked={values.student_problem_allergies}
             isInvalid={
               touched.student_problem_allergies &&
               !!errors.student_problem_allergies
             }
           >
-            Aluno possui algum problema alergico?
+            Aluno possui algum problema alérgico?
           </CheckBox>
           <FormControl id="allergy-description" w={['64.26%']}>
             <FormLabel
@@ -227,6 +277,7 @@ export const StudentHealthForm: React.FC<HealthFormProps> = ({
             }}
             onBlur={handleBlur}
             value={String(values.student_medication)}
+            isChecked={values.student_medication}
             isInvalid={
               touched.student_medication && !!errors.student_medication
             }
@@ -277,6 +328,7 @@ export const StudentHealthForm: React.FC<HealthFormProps> = ({
             }}
             onBlur={handleBlur}
             value={String(values.health_insurance)}
+            isChecked={values.health_insurance}
             isInvalid={touched.health_insurance && !!errors.health_insurance}
           >
             Aluno possui plano de saúde?
