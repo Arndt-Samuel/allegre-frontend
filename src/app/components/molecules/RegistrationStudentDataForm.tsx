@@ -1,24 +1,25 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import {
   Flex,
   FormControl,
   FormLabel,
   Icon,
   Text as ChakraText,
-  useToast
+  useToast,
+  Image
 } from '@chakra-ui/react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { PiFileArrowUpBold } from 'react-icons/pi'
 import Input from './Input'
 import InputMask from 'react-input-mask'
-import { SelectMenu, Text } from '../atoms'
+import { EthnicitySelectMenu, GenderSelectMenu, Text } from '../atoms'
 import { Gender, Ethnicity } from '@/app/enums/enums'
 import { format, isValid, parse, parseISO } from 'date-fns'
 
 interface StudentRegisterFormValues {
   name: string
-  avatarUrl?: string
+  avatarUrl?: File | null
   rg: string
   cpf: string
   nis: string
@@ -39,6 +40,19 @@ export const RegistrationStudentDataForm: React.FC<
 > = ({ onSubmit, savedData }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const toast = useToast()
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (savedData?.avatarUrl) {
+      setImagePreviewUrl(URL.createObjectURL(savedData.avatarUrl))
+    }
+
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl)
+      }
+    }
+  }, [savedData, imagePreviewUrl])
 
   const formatDateToInput = (dateString: string | null) => {
     if (!dateString) return ''
@@ -46,15 +60,10 @@ export const RegistrationStudentDataForm: React.FC<
     return format(parsedDate, 'yyyy-MM-dd')
   }
 
-  const formatDateToDisplay = (dateString: string) => {
-    const parsedDate = parseISO(dateString)
-    return format(parsedDate, 'dd/MM/yyyy')
-  }
-
   const formik = useFormik<StudentRegisterFormValues>({
     initialValues: {
       name: savedData?.name || '',
-      avatarUrl: savedData?.avatarUrl || '',
+      avatarUrl: savedData?.avatarUrl || null,
       rg: savedData?.rg || '',
       cpf: savedData?.cpf || '',
       nis: savedData?.nis || '',
@@ -66,7 +75,6 @@ export const RegistrationStudentDataForm: React.FC<
     },
     validationSchema: Yup.object({
       name: Yup.string().required('Nome completo é obrigatório'),
-      avatarUrl: Yup.string().url('URL inválida').nullable(),
       rg: Yup.string().required('RG é obrigatório'),
       cpf: Yup.string().required('CPF é obrigatório'),
       nis: Yup.string().required('NIS é obrigatório'),
@@ -86,8 +94,13 @@ export const RegistrationStudentDataForm: React.FC<
       secondary_phone: Yup.string()
     }),
     onSubmit: async (values) => {
-      const parsedDate = parse(values.dateOfBirth, 'yyyy-MM-dd', new Date())
-      if (!isValid(parsedDate)) {
+      const parsedDateOfBirth = parse(
+        values.dateOfBirth,
+        'yyyy-MM-dd',
+        new Date()
+      )
+
+      if (!isValid(parsedDateOfBirth)) {
         toast({
           title: 'Erro na data de nascimento',
           description: 'Data de nascimento inválida',
@@ -97,11 +110,14 @@ export const RegistrationStudentDataForm: React.FC<
         })
         return
       }
-      const formattedDate = format(parsedDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+
+      const formattedDateOfBirth = parsedDateOfBirth.toISOString()
+
       const submissionValues = {
         ...values,
-        dateOfBirth: formattedDate
+        dateOfBirth: formattedDateOfBirth
       }
+
       onSubmit(submissionValues)
     }
   })
@@ -116,13 +132,15 @@ export const RegistrationStudentDataForm: React.FC<
     setFieldValue
   } = formik
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      const fileUrl = URL.createObjectURL(file)
-      setFieldValue('avatarUrl', fileUrl)
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl)
+      }
+      const newImagePreviewUrl = URL.createObjectURL(file)
+      setImagePreviewUrl(newImagePreviewUrl)
+      setFieldValue('avatarUrl', file)
     }
   }
 
@@ -177,53 +195,62 @@ export const RegistrationStudentDataForm: React.FC<
               accept="image/*"
               onChange={handleFileChange}
             />
-            <Flex
-              w={'100%'}
-              h={'100%'}
-              alignItems={'center'}
-              justifyContent={'flex-start'}
-              flexDir={'column'}
-              cursor={'pointer'}
-            >
+            {imagePreviewUrl ? (
+              <Image
+                src={imagePreviewUrl}
+                alt="Prévia da Imagem"
+                maxW={'100%'}
+                maxH={'100%'}
+              />
+            ) : (
               <Flex
-                w={'64px'}
-                h={'64px'}
-                borderRadius={'132px'}
-                bg={'brand.purple20'}
-                color={'brand.primary'}
+                w={'100%'}
+                h={'100%'}
                 alignItems={'center'}
-                justifyContent={'center'}
+                justifyContent={'flex-start'}
+                flexDir={'column'}
+                cursor={'pointer'}
               >
-                <Icon as={PiFileArrowUpBold} w={'32px'} h={'32px'} />
-              </Flex>
-              <Flex flexDir={'row'} mt={'20px'}>
-                <ChakraText
-                  mr={'3px'}
-                  fontSize={'14px'}
-                  fontWeight={'700'}
-                  lineHeight={'20px'}
+                <Flex
+                  w={'64px'}
+                  h={'64px'}
+                  borderRadius={'132px'}
+                  bg={'brand.purple20'}
                   color={'brand.primary'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
                 >
-                  Clique aqui
-                </ChakraText>
+                  <Icon as={PiFileArrowUpBold} w={'32px'} h={'32px'} />
+                </Flex>
+                <Flex flexDir={'row'} mt={'20px'}>
+                  <ChakraText
+                    mr={'3px'}
+                    fontSize={'14px'}
+                    fontWeight={'700'}
+                    lineHeight={'20px'}
+                    color={'brand.primary'}
+                  >
+                    Clique aqui
+                  </ChakraText>
+                  <ChakraText
+                    fontSize={'14px'}
+                    fontWeight={'700'}
+                    lineHeight={'20px'}
+                    color={'brand.gray60'}
+                  >
+                    para adicionar o arquivo ou arraste até o campo.
+                  </ChakraText>
+                </Flex>
                 <ChakraText
                   fontSize={'14px'}
-                  fontWeight={'700'}
+                  fontWeight={'500'}
                   lineHeight={'20px'}
-                  color={'brand.gray60'}
+                  color={'brand.gray40'}
                 >
-                  para adicionar o arquivo ou arraste até o campo.
+                  Formatos suportados: PNG, JPG.
                 </ChakraText>
               </Flex>
-              <ChakraText
-                fontSize={'14px'}
-                fontWeight={'500'}
-                lineHeight={'20px'}
-                color={'brand.gray40'}
-              >
-                Formatos suportados: PNG, JPG.
-              </ChakraText>
-            </Flex>
+            )}
           </Flex>
           {touched.avatarUrl && errors.avatarUrl && (
             <ChakraText color="red" mt="2">
@@ -351,25 +378,19 @@ export const RegistrationStudentDataForm: React.FC<
             />
           </FormControl>
           <FormControl w={'28.87%'}>
-            <SelectMenu
-              name="gender"
+            <GenderSelectMenu
               value={values.gender}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('gender', value)}
               onBlur={handleBlur}
               isInvalid={touched.gender && !!errors.gender}
-              label="Gênero"
-              options={Object.values(Gender)}
             />
           </FormControl>
           <FormControl w={'28.87%'}>
-            <SelectMenu
-              name="ethnicity"
+            <EthnicitySelectMenu
               value={values.ethnicity}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('ethnicity', value)}
               onBlur={handleBlur}
               isInvalid={touched.ethnicity && !!errors.ethnicity}
-              label="Etnia"
-              options={Object.values(Ethnicity)}
             />
           </FormControl>
         </Flex>

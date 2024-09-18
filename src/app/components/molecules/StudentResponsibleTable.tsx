@@ -168,9 +168,9 @@ export const StudentResponsibleTable: React.FC<
         {isLoading ? (
           <Skeleton height="72px" my="10px" />
         ) : sortedResponsibles && sortedResponsibles.length > 0 ? (
-          sortedResponsibles.map((responsible, index) => (
+          sortedResponsibles.map((responsible) => (
             <StudentResponsibleCard
-              key={index}
+              key={responsible.id}
               responsible={responsible}
               onOpen={handleOpenModal}
             />

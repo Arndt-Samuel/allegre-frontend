@@ -3,12 +3,13 @@ import { SmallAddIcon } from '@chakra-ui/icons'
 import { Button } from '../atoms'
 import { Flex, FormControl } from '@chakra-ui/react'
 import { SearchBar } from './SearchBar'
-import { SelectMenu } from '../atoms'
+import { SelectMenuBase } from '../atoms'
 
 interface HeaderStudentListProps {
   searchTerm: string
   setSearchTerm: (term: string) => void
   classOptions: { label: string; value: string }[]
+  selectedClass: string
   setSelectedClass: (classId: string) => void
 }
 
@@ -16,6 +17,7 @@ export const HeaderStudentList: React.FC<HeaderStudentListProps> = ({
   searchTerm,
   setSearchTerm,
   classOptions,
+  selectedClass,
   setSelectedClass
 }) => {
   return (
@@ -29,15 +31,17 @@ export const HeaderStudentList: React.FC<HeaderStudentListProps> = ({
       pl={'24px'}
       pr={'24px'}
     >
-      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <SearchBar
+        placeholder="Pesquisar Alunos"
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
       <FormControl w={'30%'}>
-        <SelectMenu
+        <SelectMenuBase
           name="class"
-          value=""
-          onChange={(e) => setSelectedClass(e.target.value)}
-          label=""
           options={classOptions}
-          selectedOption=""
+          value={selectedClass}
+          onChange={setSelectedClass}
         />
       </FormControl>
       <Button

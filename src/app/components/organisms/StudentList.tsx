@@ -28,7 +28,7 @@ export const StudentList: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [totalStudents, setTotalStudents] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedClass, setSelectedClass] = useState<string | null>(null)
+  const [selectedClass, setSelectedClass] = useState<string>('')
   const [classOptions, setClassOptions] = useState<
     { label: string; value: string }[]
   >([{ label: 'Todos alunos', value: '' }])
@@ -110,6 +110,7 @@ export const StudentList: React.FC = () => {
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           classOptions={classOptions}
+          selectedClass={selectedClass}
           setSelectedClass={setSelectedClass}
         />
         <SubHeaderStudentList onSort={handleSort} />

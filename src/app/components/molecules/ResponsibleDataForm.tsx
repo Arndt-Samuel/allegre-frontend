@@ -8,7 +8,12 @@ import {
   Text as ChakraText,
   Textarea
 } from '@chakra-ui/react'
-import { SelectMenu, Text } from '../atoms'
+import {
+  EducationLevelSelectMenu,
+  EthnicitySelectMenu,
+  SelectMenuBase,
+  Text
+} from '../atoms'
 import { Input } from './Input'
 import InputMask from 'react-input-mask'
 import { PiFileArrowUpBold } from 'react-icons/pi'
@@ -136,6 +141,20 @@ export const ResponsibleDataForm = forwardRef<
     }))
     setFieldValue(name as keyof ResponsibleFormValues, formattedState.value)
   }
+
+  const degreeOfKinshipOptions = [
+    { label: 'Pai', value: 'Pai' },
+    { label: 'Mãe', value: 'Mãe' },
+    { label: 'Avô', value: 'Avô' },
+    { label: 'Avó', value: 'Avó' },
+    { label: 'Tio', value: 'Tio' },
+    { label: 'Tia', value: 'Tia' },
+    { label: 'Irmão', value: 'Irmão' },
+    { label: 'Irmã', value: 'Irmã' },
+    { label: 'Padrasto', value: 'Padrasto' },
+    { label: 'Madrasta', value: 'Madrasta' },
+    { label: 'Guardião Legal', value: 'Guardião Legal' }
+  ]
 
   return (
     <form
@@ -353,47 +372,35 @@ export const ResponsibleDataForm = forwardRef<
           justifyContent={'space-between'}
         >
           <FormControl id="degree_of_kinship" w={['45%']}>
-            <SelectMenu
+            <SelectMenuBase
               name="degree_of_kinship"
+              label="Grau de parentesco"
+              options={degreeOfKinshipOptions}
               value={values.degree_of_kinship}
-              selectedOption={values.degree_of_kinship}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('degree_of_kinship', value)}
               onBlur={handleBlur}
               isInvalid={
                 touched.degree_of_kinship && !!errors.degree_of_kinship
               }
-              label="Grau de parentesco"
-              options={[
-                'Pai',
-                'Mãe',
-                'Avô',
-                'Avó',
-                'Tio',
-                'Tia',
-                'Irmão',
-                'Irmã',
-                'Padrasto',
-                'Madrasta',
-                'Guardião Legal'
-              ]}
             />
+            {touched.degree_of_kinship && errors.degree_of_kinship ? (
+              <ChakraText color="red.500" mt={2}>
+                {errors.degree_of_kinship}
+              </ChakraText>
+            ) : null}
           </FormControl>
           <FormControl w={'45%'}>
-            <SelectMenu
-              label="Escolaridade"
-              name="education_level"
+            <EducationLevelSelectMenu
               value={values.education_level}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('education_level', value)}
               onBlur={handleBlur}
               isInvalid={touched.education_level && !!errors.education_level}
-              options={Object.values(EducationLevel)}
-              selectedOption={values.education_level}
-              onSelect={(option) => {
-                handleChange({
-                  target: { name: 'education_level', value: option }
-                })
-              }}
             />
+            {touched.education_level && errors.education_level ? (
+              <ChakraText color="red.500" mt={2}>
+                {errors.education_level}
+              </ChakraText>
+            ) : null}
           </FormControl>
         </Flex>
         <Flex
@@ -461,14 +468,11 @@ export const ResponsibleDataForm = forwardRef<
           justifyContent={'space-between'}
         >
           <FormControl w={'45%'}>
-            <SelectMenu
-              name="ethnicity"
+            <EthnicitySelectMenu
               value={values.ethnicity}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('ethnicity', value)}
               onBlur={handleBlur}
               isInvalid={touched.ethnicity && !!errors.ethnicity}
-              label="Etnia"
-              options={Object.values(Ethnicity)}
             />
           </FormControl>
           <FormControl id={'primary-phone'} w={['45%']}>

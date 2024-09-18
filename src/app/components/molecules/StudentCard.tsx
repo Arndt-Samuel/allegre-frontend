@@ -39,7 +39,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({ student }) => (
         w={'40px'}
         h={'40px'}
         borderRadius={'76px'}
-        backgroundImage={`url(${student.avatarUrl})`}
+        src={student.avatarUrl}
         backgroundSize="cover"
       />
       <Text
@@ -67,11 +67,11 @@ export const StudentCard: React.FC<StudentCardProps> = ({ student }) => (
       </Text>
     </Flex>
     <Flex w={'16.58%'} alignItems={'center'} justifyContent={'space-between'}>
-      {(student.workshops || []).map((workshop, index) => (
+      {(student.workshops || []).map((workshop) => (
         <Flex
           alignItems={'center'}
           justifyContent={'center'}
-          key={index}
+          key={workshop.classId}
           mx={'4px'}
         >
           <Tag colorScheme="blue">{workshop?.className}</Tag>

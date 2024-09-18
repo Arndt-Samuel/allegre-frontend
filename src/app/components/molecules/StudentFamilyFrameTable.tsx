@@ -176,9 +176,9 @@ export const StudentFamilyFrameTable: React.FC<StudentFamilyFrameProps> = ({
         {isLoading ? (
           <Skeleton height="72px" my="10px" />
         ) : sortedRelatives.length > 0 ? (
-          sortedRelatives.map((relative, index) => (
+          sortedRelatives.map((relative) => (
             <StudentFamilyFrameCard
-              key={index}
+              key={relative.id}
               relative={relative}
               onOpen={handleOpenModal}
             />

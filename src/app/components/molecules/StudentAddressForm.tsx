@@ -1,10 +1,16 @@
 import React from 'react'
-import { Flex, FormControl, FormLabel, useToast } from '@chakra-ui/react'
+import {
+  Flex,
+  FormControl,
+  FormLabel,
+  useToast,
+  Text as ChakraText
+} from '@chakra-ui/react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import Input from './Input'
 import InputMask from 'react-input-mask'
-import { SelectMenu, Text } from '../atoms'
+import { HousingStatusSelectMenu, StateSelectMenu, Text } from '../atoms'
 import { getAddressByZip } from '@/app/services/addressService'
 import { HousingStatus } from '@/app/enums/enums'
 import { createStudentAddressCall } from '@/app/api/student'
@@ -106,6 +112,36 @@ export const StudentAddressForm: React.FC<AddressFormProps> = ({
       }
     }
   }
+
+  const brazilianStates = [
+    { label: 'Acre', value: 'AC' },
+    { label: 'Alagoas', value: 'AL' },
+    { label: 'Amapá', value: 'AP' },
+    { label: 'Amazonas', value: 'AM' },
+    { label: 'Bahia', value: 'BA' },
+    { label: 'Ceará', value: 'CE' },
+    { label: 'Distrito Federal', value: 'DF' },
+    { label: 'Espírito Santo', value: 'ES' },
+    { label: 'Goiás', value: 'GO' },
+    { label: 'Maranhão', value: 'MA' },
+    { label: 'Mato Grosso', value: 'MT' },
+    { label: 'Mato Grosso do Sul', value: 'MS' },
+    { label: 'Minas Gerais', value: 'MG' },
+    { label: 'Pará', value: 'PA' },
+    { label: 'Paraíba', value: 'PB' },
+    { label: 'Paraná', value: 'PR' },
+    { label: 'Pernambuco', value: 'PE' },
+    { label: 'Piauí', value: 'PI' },
+    { label: 'Rio de Janeiro', value: 'RJ' },
+    { label: 'Rio Grande do Norte', value: 'RN' },
+    { label: 'Rio Grande do Sul', value: 'RS' },
+    { label: 'Rondônia', value: 'RO' },
+    { label: 'Roraima', value: 'RR' },
+    { label: 'Santa Catarina', value: 'SC' },
+    { label: 'São Paulo', value: 'SP' },
+    { label: 'Sergipe', value: 'SE' },
+    { label: 'Tocantins', value: 'TO' }
+  ]
 
   return (
     <form id="form-address" onSubmit={handleSubmit} style={{ width: '84%' }}>
@@ -253,44 +289,17 @@ export const StudentAddressForm: React.FC<AddressFormProps> = ({
             />
           </FormControl>
           <FormControl id="address_state" w={['28.87%']}>
-            <SelectMenu
-              name="address_state"
+            <StateSelectMenu
               value={values.address_state}
-              selectedOption={values.address_state}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('address_state', value)}
               onBlur={handleBlur}
               isInvalid={touched.address_state && !!errors.address_state}
-              label="Estado"
-              options={[
-                'AC',
-                'AL',
-                'AM',
-                'AP',
-                'BA',
-                'CE',
-                'DF',
-                'ES',
-                'GO',
-                'MA',
-                'MG',
-                'MS',
-                'MT',
-                'PA',
-                'PB',
-                'PE',
-                'PI',
-                'PR',
-                'RJ',
-                'RN',
-                'RO',
-                'RR',
-                'RS',
-                'SC',
-                'SE',
-                'SP',
-                'TO'
-              ]}
             />
+            {touched.address_state && errors.address_state ? (
+              <ChakraText color="red.500" mt={2}>
+                {errors.address_state}
+              </ChakraText>
+            ) : null}
           </FormControl>
         </Flex>
         <Flex
@@ -325,16 +334,17 @@ export const StudentAddressForm: React.FC<AddressFormProps> = ({
             />
           </FormControl>
           <FormControl w={'28.87%'}>
-            <SelectMenu
-              name="housingStatus"
+            <HousingStatusSelectMenu
               value={values.housingStatus}
-              selectedOption={values.housingStatus}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('housingStatus', value)}
               onBlur={handleBlur}
               isInvalid={touched.housingStatus && !!errors.housingStatus}
-              label="Status de Moradia"
-              options={Object.values(HousingStatus)}
             />
+            {touched.housingStatus && errors.housingStatus ? (
+              <ChakraText color="red.500" mt={2}>
+                {errors.housingStatus}
+              </ChakraText>
+            ) : null}
           </FormControl>
           <Flex w={['28.87%']} />
         </Flex>

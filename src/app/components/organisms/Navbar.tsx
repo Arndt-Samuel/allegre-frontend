@@ -50,7 +50,12 @@ export const NavBar: React.FC = () => {
           aria-label="Students"
           href="/students/students-table"
         />
-        <IconButton mt={'20px'} icon={<PiAddressBookBold />} aria-label="" />
+        <IconButton
+          mt={'20px'}
+          icon={<PiAddressBookBold />}
+          aria-label="Classes"
+          href="/classes/classes-table"
+        />
         <IconButton mt={'20px'} icon={<PiUsersBold />} aria-label="" />
       </Flex>
       <Flex

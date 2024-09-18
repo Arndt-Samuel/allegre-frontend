@@ -1,5 +1,11 @@
-import { Flex, FormControl, FormLabel, useToast } from '@chakra-ui/react'
-import { SelectMenu, Text } from '../atoms'
+import {
+  Flex,
+  FormControl,
+  FormLabel,
+  useToast,
+  Text as ChakraText
+} from '@chakra-ui/react'
+import { SelectMenuBase, Text } from '../atoms'
 import Textarea from './Textarea'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -65,6 +71,25 @@ export const StudentComplementaryDataForm: React.FC<
       }
     }
   })
+
+  const clothingSizeOptions = [
+    { label: '2', value: '2' },
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: 'PP', value: 'PP' },
+    { label: 'P', value: 'P' },
+    { label: 'M', value: 'M' },
+    { label: 'G', value: 'G' },
+    { label: 'GG', value: 'GG' },
+    { label: 'XG', value: 'XG' },
+    { label: 'XGG', value: 'XGG' },
+    { label: 'EG', value: 'EG' },
+    { label: 'EGG', value: 'EGG' }
+  ]
+
   return (
     <form
       id="form-complementary-data"
@@ -93,32 +118,20 @@ export const StudentComplementaryDataForm: React.FC<
           justifyContent={'space-between'}
         >
           <FormControl w={'28.87%'}>
-            <SelectMenu
+            <SelectMenuBase
               name="clothingSize"
+              label="Número da roupa"
+              options={clothingSizeOptions}
               value={values.clothingSize}
-              selectedOption={values.clothingSize}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('clothingSize', value)}
               onBlur={handleBlur}
               isInvalid={touched.clothingSize && !!errors.clothingSize}
-              label="Número da roupa"
-              options={[
-                '2',
-                '4',
-                '6',
-                '8',
-                '10',
-                '12',
-                'PP',
-                'P',
-                'M',
-                'G',
-                'GG',
-                'XG',
-                'XGG',
-                'EG',
-                'EGG'
-              ]}
             />
+            {touched.clothingSize && errors.clothingSize ? (
+              <ChakraText color="red.500" mt={2}>
+                {errors.clothingSize}
+              </ChakraText>
+            ) : null}
           </FormControl>
           <FormControl id="number-college" w={['28.87%']}>
             <FormLabel

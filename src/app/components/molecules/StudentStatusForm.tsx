@@ -1,7 +1,13 @@
-import { Flex, FormControl, FormLabel, useToast } from '@chakra-ui/react'
+import {
+  Flex,
+  FormControl,
+  FormLabel,
+  useToast,
+  Text as ChakraText
+} from '@chakra-ui/react'
 import CheckBox from './Checkbox'
 import Textarea from './Textarea'
-import { SelectMenu } from '../atoms'
+import { DegreeOfKinshipSelectMenu, MaritalStatusSelectMenu } from '../atoms'
 import React, { useState, forwardRef } from 'react'
 import Input from './Input'
 import { MaskToCurrency } from './MaskToCurrency'
@@ -205,43 +211,32 @@ export const StudentStatusForm = forwardRef<HTMLFormElement, StatusFormProps>(
             justifyContent={'space-between'}
           >
             <FormControl w={'45%'}>
-              <SelectMenu
-                name="degree_of_kinship"
+              <DegreeOfKinshipSelectMenu
                 value={values.degree_of_kinship}
-                onChange={handleChange}
+                onChange={(value) => setFieldValue('degree_of_kinship', value)}
                 onBlur={handleBlur}
-                touched={touched.degree_of_kinship}
-                error={errors.degree_of_kinship}
-                label="Grau de parentesco"
-                options={[
-                  'Pai',
-                  'Mãe',
-                  'Avô',
-                  'Avó',
-                  'Tio',
-                  'Tia',
-                  'Irmão',
-                  'Irmã',
-                  'Primo',
-                  'Prima',
-                  'Padrasto',
-                  'Madrasta',
-                  'Guardião Legal',
-                  'Outro'
-                ]}
+                isInvalid={
+                  touched.degree_of_kinship && !!errors.degree_of_kinship
+                }
               />
+              {touched.degree_of_kinship && errors.degree_of_kinship ? (
+                <ChakraText color="red.500" mt={2}>
+                  {errors.degree_of_kinship}
+                </ChakraText>
+              ) : null}
             </FormControl>
             <FormControl w={'45%'}>
-              <SelectMenu
-                name="marital_status"
+              <MaritalStatusSelectMenu
                 value={values.marital_status}
-                onChange={handleChange}
+                onChange={(value) => setFieldValue('marital_status', value)}
                 onBlur={handleBlur}
-                touched={touched.marital_status}
-                error={errors.marital_status}
-                label="Estado Civil"
-                options={['Solteiro', 'Casado', 'Divorciado', 'Viuvo']}
+                isInvalid={touched.marital_status && !!errors.marital_status}
               />
+              {touched.marital_status && errors.marital_status ? (
+                <ChakraText color="red.500" mt={2}>
+                  {errors.marital_status}
+                </ChakraText>
+              ) : null}
             </FormControl>
           </Flex>
           <Flex

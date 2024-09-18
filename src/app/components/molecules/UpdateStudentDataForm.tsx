@@ -5,14 +5,15 @@ import {
   FormLabel,
   Icon,
   Text as ChakraText,
-  useToast
+  useToast,
+  Image
 } from '@chakra-ui/react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { PiFileArrowUpBold } from 'react-icons/pi'
 import Input from './Input'
 import InputMask from 'react-input-mask'
-import { SelectMenu, Text } from '../atoms'
+import { EthnicitySelectMenu, GenderSelectMenu, Text } from '../atoms'
 import { Gender, Ethnicity } from '@/app/enums/enums'
 import { format, isValid, parse, parseISO } from 'date-fns'
 import { api } from '@/app/api'
@@ -20,7 +21,7 @@ import { updateStudentCall } from '@/app/api/student'
 
 interface UpdateStudentFormValues {
   name: string
-  avatarUrl?: string
+  avatarUrl?: string | null
   rg: string
   cpf: string
   nis: string
@@ -217,7 +218,64 @@ export const UpdateStudentDataForm: React.FC<UpdateStudentDataFormProps> = ({
             justifyContent={'center'}
             onClick={handleClick}
             cursor="pointer"
+            flexDirection="column"
           >
+            {values.avatarUrl ? (
+              <Image
+                src={values.avatarUrl}
+                alt="Avatar do Estudante"
+                maxW={'100%'}
+                maxH={'100%'}
+              />
+            ) : (
+              <Flex
+                w={'100%'}
+                h={'100%'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                flexDir={'column'}
+                cursor={'pointer'}
+              >
+                <Flex
+                  w={'64px'}
+                  h={'64px'}
+                  borderRadius={'132px'}
+                  bg={'brand.purple20'}
+                  color={'brand.primary'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                >
+                  <Icon as={PiFileArrowUpBold} w={'32px'} h={'32px'} />
+                </Flex>
+                <Flex flexDir={'row'} mt={'20px'}>
+                  <ChakraText
+                    mr={'3px'}
+                    fontSize={'14px'}
+                    fontWeight={'700'}
+                    lineHeight={'20px'}
+                    color={'brand.primary'}
+                  >
+                    Clique aqui
+                  </ChakraText>
+                  <ChakraText
+                    fontSize={'14px'}
+                    fontWeight={'700'}
+                    lineHeight={'20px'}
+                    color={'brand.gray60'}
+                  >
+                    para adicionar o arquivo ou arraste até o campo.
+                  </ChakraText>
+                </Flex>
+                <ChakraText
+                  fontSize={'14px'}
+                  fontWeight={'500'}
+                  lineHeight={'20px'}
+                  color={'brand.gray40'}
+                >
+                  Formatos suportados: PNG, JPG.
+                </ChakraText>
+              </Flex>
+            )}
             <input
               ref={fileInputRef}
               style={{ display: 'none' }}
@@ -225,53 +283,6 @@ export const UpdateStudentDataForm: React.FC<UpdateStudentDataFormProps> = ({
               accept="image/*"
               onChange={handleFileChange}
             />
-            <Flex
-              w={'100%'}
-              h={'100%'}
-              alignItems={'center'}
-              justifyContent={'flex-start'}
-              flexDir={'column'}
-              cursor={'pointer'}
-            >
-              <Flex
-                w={'64px'}
-                h={'64px'}
-                borderRadius={'132px'}
-                bg={'brand.purple20'}
-                color={'brand.primary'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <Icon as={PiFileArrowUpBold} w={'32px'} h={'32px'} />
-              </Flex>
-              <Flex flexDir={'row'} mt={'20px'}>
-                <ChakraText
-                  mr={'3px'}
-                  fontSize={'14px'}
-                  fontWeight={'700'}
-                  lineHeight={'20px'}
-                  color={'brand.primary'}
-                >
-                  Clique aqui
-                </ChakraText>
-                <ChakraText
-                  fontSize={'14px'}
-                  fontWeight={'700'}
-                  lineHeight={'20px'}
-                  color={'brand.gray60'}
-                >
-                  para adicionar o arquivo ou arraste até o campo.
-                </ChakraText>
-              </Flex>
-              <ChakraText
-                fontSize={'14px'}
-                fontWeight={'500'}
-                lineHeight={'20px'}
-                color={'brand.gray40'}
-              >
-                Formatos suportados: PNG, JPG.
-              </ChakraText>
-            </Flex>
           </Flex>
           {touched.avatarUrl && errors.avatarUrl && (
             <ChakraText color="red" mt="2">
@@ -399,33 +410,19 @@ export const UpdateStudentDataForm: React.FC<UpdateStudentDataFormProps> = ({
             />
           </FormControl>
           <FormControl w={'28.87%'}>
-            <SelectMenu
-              name="gender"
+            <GenderSelectMenu
               value={values.gender}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('gender', value)}
               onBlur={handleBlur}
               isInvalid={touched.gender && !!errors.gender}
-              label="Gênero"
-              options={Object.values(Gender).map((g) => ({
-                label: g,
-                value: g
-              }))}
-              selectedOption={values.gender}
             />
           </FormControl>
           <FormControl w={'28.87%'}>
-            <SelectMenu
-              name="ethnicity"
+            <EthnicitySelectMenu
               value={values.ethnicity}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue('ethnicity', value)}
               onBlur={handleBlur}
               isInvalid={touched.ethnicity && !!errors.ethnicity}
-              label="Etnia"
-              options={Object.values(Ethnicity).map((e) => ({
-                label: e,
-                value: e
-              }))}
-              selectedOption={values.ethnicity}
             />
           </FormControl>
         </Flex>

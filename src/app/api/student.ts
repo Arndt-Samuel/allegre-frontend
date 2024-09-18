@@ -119,9 +119,17 @@ export const getStudents = async () => {
   }
 }
 
-export const createStudentCall = async (data: CreateStudentValues) => {
-  const response = await api.post('/student', data)
-  return response.data
+export const createStudentCall = async (data: FormData) => {
+  try {
+    const response = await api.post('/student', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    return response.data
+  } catch (error) {
+    throw new Error('Erro ao criar estudante')
+  }
 }
 
 export const createStudentAddressCall = async (

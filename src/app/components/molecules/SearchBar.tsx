@@ -5,11 +5,13 @@ import { PiMagnifyingGlassBold } from 'react-icons/pi'
 interface SearchBarProps {
   searchTerm: string
   setSearchTerm: (term: string) => void
+  placeholder?: string
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   searchTerm,
-  setSearchTerm
+  setSearchTerm,
+  placeholder
 }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
@@ -32,7 +34,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           borderWidth="0px"
           w="100%"
           h="100%"
-          placeholder="Pesquisar Alunos"
+          placeholder={placeholder}
           _placeholder={{ color: 'brand.grey50' }}
           focusBorderColor="transparent"
           fontSize={'16px'}

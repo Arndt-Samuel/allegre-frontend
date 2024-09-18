@@ -4,15 +4,17 @@ import {
   IconButton,
   FormControl,
   FormLabel,
-  useToast
+  useToast,
+  Text as ChakraText
 } from '@chakra-ui/react'
 import Input from './Input'
-import { Text, SelectMenu } from '../atoms'
+import { Text } from '../atoms'
 import { PiPlusCircleBold, PiMinusCircleBold } from 'react-icons/pi'
 import { useFormik, FormikErrors } from 'formik'
 import * as Yup from 'yup'
 import { getWorkshops, createWorkshopCall } from '@/app/api/student'
 import { parse, isValid, format } from 'date-fns'
+import { SelectMenuBase } from '../atoms'
 
 interface WorkshopFormValues {
   classId: string
@@ -213,134 +215,177 @@ export const WorkshopForm: React.FC<SchoolDataFormProps> = ({
         <Flex w={'100%'} h={'19.51%'}>
           <Text.CardTitle>Oficinas</Text.CardTitle>
         </Flex>
-        {workshops.map((workshop, index) => (
-          <Flex
-            key={index}
-            w={'100%'}
-            h={'46.34%'}
-            flexDir={'row'}
-            alignItems={'center'}
-            justifyContent={'space-between'}
-            mb={4}
-          >
-            <FormControl w={'28.87%'}>
-              <SelectMenu
-                name={`workshops[${index}].classId`}
-                value={workshop.classId}
-                onChange={(e) => {
-                  const selectedClass = workshopOptions.find(
-                    (workshop) => workshop.name === e.target.value
-                  )
-                  handleWorkshopChange(
-                    index,
-                    'classId',
-                    selectedClass?.id || ''
-                  )
-                }}
-                label="Oficinas"
-                options={getAvailableWorkshopOptions(
-                  workshops.map((w) => w.classId)
-                ).map((option) => option.name)}
-                selectedOption={
-                  workshopOptions.find(
-                    (option) => option.id === workshop.classId
-                  )?.name || ''
+        {workshops.map((workshop, index) => {
+          const selectedIds = workshops
+            .filter((_, i) => i !== index)
+            .map((w) => w.classId)
+
+          let availableOptions = getAvailableWorkshopOptions(selectedIds).map(
+            (option) => ({
+              label: option.name,
+              value: option.id
+            })
+          )
+
+          if (workshop.classId) {
+            const currentOption = workshopOptions.find(
+              (opt) => opt.id === workshop.classId
+            )
+            if (
+              currentOption &&
+              !availableOptions.some((opt) => opt.value === workshop.classId)
+            ) {
+              availableOptions = [
+                ...availableOptions,
+                {
+                  label: currentOption.name,
+                  value: currentOption.id
                 }
-              />
-            </FormControl>
-            <FormControl id={`dateOfEntry-${index}`} w={['28.87%']}>
-              <FormLabel
-                fontWeight={'700'}
-                ml={'5px'}
-                mb={'0px'}
-                color={'brand.gray60'}
-                fontSize={'14px'}
-              >
-                Data de entrada no projeto
-              </FormLabel>
-              <Input
-                name={`workshops[${index}].dateOfEntry`}
-                value={workshop.dateOfEntry}
-                onChange={(e) =>
-                  handleWorkshopChange(index, 'dateOfEntry', e.target.value)
-                }
-                onBlur={formik.handleBlur}
-                error={
-                  (
-                    formik.errors.workshops?.[
-                      index
-                    ] as FormikErrors<WorkshopFormValues>
-                  )?.dateOfEntry
-                }
-                placeholder="Select Date and Time"
-                size="md"
-                type="date"
-              />
-            </FormControl>
-            <FormControl id={`dateOfExit-${index}`} w={['28.87%']}>
-              <FormLabel
-                fontWeight={'700'}
-                ml={'5px'}
-                mb={'0px'}
-                color={'brand.gray60'}
-                fontSize={'14px'}
-              >
-                Data de saída do projeto
-              </FormLabel>
-              <Input
-                name={`workshops[${index}].dateOfExit`}
-                value={workshop.dateOfExit || ''}
-                onChange={(e) =>
-                  handleWorkshopChange(index, 'dateOfExit', e.target.value)
-                }
-                onBlur={formik.handleBlur}
-                error={
-                  (
-                    formik.errors.workshops?.[
-                      index
-                    ] as FormikErrors<WorkshopFormValues>
-                  )?.dateOfExit
-                }
-                placeholder="Select Date and Time"
-                size="md"
-                type="date"
-              />
-            </FormControl>
-            {index === 0 ? (
-              <IconButton
-                aria-label="AddOficina"
-                icon={<PiPlusCircleBold />}
-                color="brand.primary"
-                colorScheme="none"
-                w={'48px'}
-                h={'48px'}
-                size={'lg'}
-                borderRadius={'123px'}
-                bg={'brand.purple20'}
-                alignItems={'center'}
-                justifyContent={'center'}
-                mt={'24px'}
-                onClick={addWorkshop}
-              />
-            ) : (
-              <IconButton
-                aria-label="RemoveOficina"
-                icon={<PiMinusCircleBold />}
-                color="brand.primary"
-                colorScheme="none"
-                w={'48px'}
-                h={'48px'}
-                size={'lg'}
-                borderRadius={'123px'}
-                bg={'brand.purple20'}
-                alignItems={'center'}
-                justifyContent={'center'}
-                onClick={() => removeWorkshop(index)}
-                mt={'24px'}
-              />
-            )}
-          </Flex>
-        ))}
+              ]
+            }
+          }
+
+          const workshopError = formik.errors.workshops?.[index]
+          const workshopTouched = formik.touched.workshops?.[index]
+
+          const classIdError =
+            workshopError &&
+            typeof workshopError !== 'string' &&
+            'classId' in workshopError
+              ? workshopError.classId
+              : undefined
+
+          const classIdTouched =
+            workshopTouched &&
+            typeof workshopTouched !== 'boolean' &&
+            'classId' in workshopTouched
+              ? workshopTouched.classId
+              : undefined
+
+          const isClassIdInvalid = !!classIdError && !!classIdTouched
+
+          return (
+            <Flex
+              key={index}
+              w={'100%'}
+              h={'46.34%'}
+              flexDir={'row'}
+              alignItems={'center'}
+              justifyContent={'space-between'}
+              mb={4}
+            >
+              <FormControl w={'28.87%'}>
+                <SelectMenuBase
+                  name={`workshops[${index}].classId`}
+                  label="Oficinas"
+                  options={availableOptions}
+                  value={workshop.classId}
+                  onChange={(value) =>
+                    handleWorkshopChange(index, 'classId', value)
+                  }
+                  onBlur={formik.handleBlur}
+                  isInvalid={isClassIdInvalid}
+                />
+                {isClassIdInvalid ? (
+                  <ChakraText color="red.500" mt={2}>
+                    {classIdError}
+                  </ChakraText>
+                ) : null}
+              </FormControl>
+              <FormControl id={`dateOfEntry-${index}`} w={['28.87%']}>
+                <FormLabel
+                  fontWeight={'700'}
+                  ml={'5px'}
+                  mb={'0px'}
+                  color={'brand.gray60'}
+                  fontSize={'14px'}
+                >
+                  Data de entrada no projeto
+                </FormLabel>
+                <Input
+                  name={`workshops[${index}].dateOfEntry`}
+                  value={workshop.dateOfEntry}
+                  onChange={(e) =>
+                    handleWorkshopChange(index, 'dateOfEntry', e.target.value)
+                  }
+                  onBlur={formik.handleBlur}
+                  error={
+                    (
+                      formik.errors.workshops?.[
+                        index
+                      ] as FormikErrors<WorkshopFormValues>
+                    )?.dateOfEntry
+                  }
+                  placeholder="Select Date and Time"
+                  size="md"
+                  type="date"
+                />
+              </FormControl>
+              <FormControl id={`dateOfExit-${index}`} w={['28.87%']}>
+                <FormLabel
+                  fontWeight={'700'}
+                  ml={'5px'}
+                  mb={'0px'}
+                  color={'brand.gray60'}
+                  fontSize={'14px'}
+                >
+                  Data de saída do projeto
+                </FormLabel>
+                <Input
+                  name={`workshops[${index}].dateOfExit`}
+                  value={workshop.dateOfExit || ''}
+                  onChange={(e) =>
+                    handleWorkshopChange(index, 'dateOfExit', e.target.value)
+                  }
+                  onBlur={formik.handleBlur}
+                  error={
+                    (
+                      formik.errors.workshops?.[
+                        index
+                      ] as FormikErrors<WorkshopFormValues>
+                    )?.dateOfExit
+                  }
+                  placeholder="Select Date and Time"
+                  size="md"
+                  type="date"
+                />
+              </FormControl>
+              {index === 0 ? (
+                <IconButton
+                  aria-label="AddOficina"
+                  icon={<PiPlusCircleBold />}
+                  color="brand.primary"
+                  colorScheme="none"
+                  w={'48px'}
+                  h={'48px'}
+                  size={'lg'}
+                  borderRadius={'123px'}
+                  bg={'brand.purple20'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  mt={'24px'}
+                  onClick={addWorkshop}
+                />
+              ) : (
+                <IconButton
+                  aria-label="RemoveOficina"
+                  icon={<PiMinusCircleBold />}
+                  color="brand.primary"
+                  colorScheme="none"
+                  w={'48px'}
+                  h={'48px'}
+                  size={'lg'}
+                  borderRadius={'123px'}
+                  bg={'brand.purple20'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  onClick={() => removeWorkshop(index)}
+                  mt={'24px'}
+                />
+              )}
+            </Flex>
+          )
+        })}
       </Flex>
     </form>
   )
