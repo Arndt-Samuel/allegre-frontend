@@ -28,6 +28,7 @@
     "react-number-format": "^5.4.0",
     "react-query": "^3.39.3",
     "yup": "^1.4.0",
+    "yup-password": "^0.4.0",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

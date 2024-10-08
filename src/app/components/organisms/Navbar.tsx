@@ -56,7 +56,12 @@ export const NavBar: React.FC = () => {
           aria-label="Classes"
           href="/classes/classes-table"
         />
-        <IconButton mt={'20px'} icon={<PiUsersBold />} aria-label="" />
+        <IconButton
+          mt={'20px'}
+          icon={<PiUsersBold />}
+          aria-label=""
+          href="/users/users-table"
+        />
       </Flex>
       <Flex
         flexDir={'column'}

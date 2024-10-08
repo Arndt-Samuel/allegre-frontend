@@ -19,10 +19,11 @@ interface SelectMenuBaseProps {
   label?: string
   options: Option[]
   value: string
-  onChange: (value: string) => void
+  onChange?: (value: string) => void
   name: string
   isInvalid?: boolean
   onBlur?: (event: React.FocusEvent<any>) => void
+  isDisabled?: boolean
 }
 
 export const SelectMenuBase: React.FC<SelectMenuBaseProps> = ({
@@ -32,25 +33,25 @@ export const SelectMenuBase: React.FC<SelectMenuBaseProps> = ({
   onChange,
   name,
   isInvalid,
-  onBlur
+  onBlur,
+  isDisabled
 }) => {
   const selectedOption = options.find((option) => option.value === value)
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange(event.target.value)
-  }
 
   return (
-    <FormControl isInvalid={isInvalid}>
-      <FormLabel
-        htmlFor={name}
-        fontWeight={'700'}
-        ml={'5px'}
-        mb={'5px'}
-        color={'brand.gray60'}
-        fontSize={'14px'}
-      >
-        {label}
-      </FormLabel>
+    <FormControl isInvalid={isInvalid} isDisabled={isDisabled}>
+      {label && (
+        <FormLabel
+          htmlFor={name}
+          fontWeight={'700'}
+          ml={'5px'}
+          mb={'5px'}
+          color={'brand.gray60'}
+          fontSize={'14px'}
+        >
+          {label}
+        </FormLabel>
+      )}
       <Menu matchWidth>
         <MenuButton
           as={Button}
@@ -72,28 +73,35 @@ export const SelectMenuBase: React.FC<SelectMenuBaseProps> = ({
           _focus={{
             borderColor: 'brand.primary'
           }}
+          isDisabled={isDisabled}
         >
           {selectedOption ? selectedOption.label : `Selecionar ${label}`}
         </MenuButton>
-        <MenuList
-          w={'100%'}
-          border="1px solid"
-          borderColor="brand.gray30"
-          alignItems={'center'}
-          justifyContent={'center'}
-          overflowY="auto"
-          maxHeight="415px"
-        >
-          {options.map((option) => (
-            <MenuItem
-              key={option.value}
-              onClick={() => onChange(option.value)}
-              color={'brand.gray60'}
-            >
-              {option.label}
-            </MenuItem>
-          ))}
-        </MenuList>
+        {!isDisabled && (
+          <MenuList
+            w={'100%'}
+            border="1px solid"
+            borderColor="brand.gray30"
+            alignItems={'center'}
+            justifyContent={'center'}
+            overflowY="auto"
+            maxHeight="415px"
+          >
+            {options.map((option) => (
+              <MenuItem
+                key={option.value}
+                onClick={() => {
+                  if (onChange) {
+                    onChange(option.value)
+                  }
+                }}
+                color={'brand.gray60'}
+              >
+                {option.label}
+              </MenuItem>
+            ))}
+          </MenuList>
+        )}
       </Menu>
     </FormControl>
   )

@@ -30,3 +30,15 @@ export enum HousingStatus {
   Casas_de_Repouso = 'Casas de Repouso',
   Abrigos = 'Abrigos'
 }
+
+export enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ORG_ADMIN = 'ORG_ADMIN',
+  ORG_MEMBER = 'ORG_MEMBER',
+  ORG_TEACHER = 'ORG_TEACHER'
+}
+
+export enum Status {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
+}
